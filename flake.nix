@@ -34,6 +34,9 @@
           inherit pkgs;
           name = "nvim-wrapped-jessevdp";
           configRoot = ./.;
+          extraPackages = with pkgs; [
+            tree-sitter # for nvim-treesitter
+          ];
         }).wrapper;
 
       devShells.default = pkgs.mkShell {
