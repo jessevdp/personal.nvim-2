@@ -3,3 +3,5 @@ vim.g.maplocalleader = " "
 
 require("config.globals")
 require("config.search")
+
+require("config.treesitter")
