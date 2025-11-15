@@ -35,5 +35,10 @@
           name = "nvim-wrapped-jessevdp";
           configRoot = ./.;
         }).wrapper;
+
+      devShells.default = pkgs.mkShell {
+        packages = with pkgs; [
+        ];
+      };
     });
 }
