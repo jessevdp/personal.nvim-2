@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime": {
+    "version": "LuaJIT",
+    "path": [
+      "lua/?.lua",
+      "lua/?/init.lua"
+    ]
+  },
+  "workspace": {
+    "checkThirdParty": false,
+    "library": [
+      "${env:VIMRUNTIME}",
+      "${env:XDG_DATA_HOME}/${env:NVIM_APPNAME}/site/pack/core/opt" // see `:h vim.pack-directory`
+    ]
+  },
+  "format": {
+    "enable": false // use stylua instead
+  }
+}
