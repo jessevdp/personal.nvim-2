@@ -5,3 +5,4 @@ require("config.globals")
 require("config.search")
 
 require("config.treesitter")
+require("config.lsp")
