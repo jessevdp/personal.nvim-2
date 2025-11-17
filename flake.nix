@@ -43,6 +43,7 @@
         packages = with pkgs; [
           lua-language-server
           stylua
+          vscode-json-languageserver
         ];
       };
     });
