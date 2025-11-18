@@ -6,3 +6,5 @@ require("config.search")
 
 require("config.treesitter")
 require("config.lsp")
+
+require("config.highlight-yank")
