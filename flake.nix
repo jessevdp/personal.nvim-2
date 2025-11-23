@@ -44,6 +44,11 @@
           lua-language-server
           stylua
           vscode-json-languageserver
+
+          nixd
+          alejandra
+          deadnix
+          statix
         ];
       };
     });
