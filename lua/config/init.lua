@@ -1,6 +1,8 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.opt.updatetime = 500
+
 require("config.indentation")
 require("config.mouse")
 require("config.quickfix")
