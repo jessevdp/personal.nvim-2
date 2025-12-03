@@ -3,6 +3,7 @@ vim.g.maplocalleader = " "
 
 require("config.indentation")
 require("config.mouse")
+require("config.scroll")
 
 require("config.treesitter")
 require("config.lsp")
