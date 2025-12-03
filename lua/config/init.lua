@@ -7,6 +7,7 @@ require("config.quickfix")
 require("config.scroll")
 require("config.search")
 require("config.splits")
+require("config.terminal")
 
 require("config.treesitter")
 require("config.lsp")
