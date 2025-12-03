@@ -15,3 +15,5 @@ require("config.wrapping")
 
 require("config.treesitter")
 require("config.lsp")
+
+require("config.explorer")
