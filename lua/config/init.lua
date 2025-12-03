@@ -8,6 +8,7 @@ require("config.scroll")
 require("config.search")
 require("config.splits")
 require("config.terminal")
+require("config.undo")
 require("config.wrapping")
 
 require("config.treesitter")
