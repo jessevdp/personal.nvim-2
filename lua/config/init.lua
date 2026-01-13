@@ -12,6 +12,7 @@ require("config.splits")
 require("config.terminal")
 require("config.undo")
 require("config.wrapping")
+require("config.ui")
 
 require("config.treesitter")
 require("config.lsp")
