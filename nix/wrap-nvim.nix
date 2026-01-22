@@ -11,6 +11,22 @@ wrappers.lib.wrapModule ({
   configSource = mkNvimConfigSource {
     root = config.configRoot;
   };
+
+  nvimInit =
+    config.pkgs.writeText "nvim-init.lua"
+    # lua
+    ''
+      dofile([[${./nvim-pack-lock-install.lua}]]).run({
+        source_path = [[${configSource}/nvim-pack-lock.json]],
+        wanst_symlink = false,
+      })
+
+      vim.env.MYVIMRC = [[${configSource}/init.lua]]
+      vim.opt.runtimepath:prepend([[${configSource}]])
+      vim.opt.runtimepath:append([[${configSource}/after]])
+
+      vim.cmd.source([[${configSource}/init.lua]])
+    '';
 in {
   options = {
     name = lib.mkOption {
@@ -36,12 +52,8 @@ in {
   config = {
     package = config.pkgs.neovim;
     env = {
-      NVIM_APPNAME = config.name;
-      VIMINIT =
-        "let \\$MYVIMRC='${configSource}/init.lua'"
-        + " | set runtimepath^=${configSource}"
-        + " | set runtimepath+=${configSource}/after"
-        + " | source ${configSource}/init.lua";
+      NVIM_APPNAME = "\${NVIM_APPNAME:-${config.name}}";
+      VIMINIT = "luafile ${nvimInit}";
     };
     extraPackages = [
       config.ripgrepPackage
