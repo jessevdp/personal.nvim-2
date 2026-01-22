@@ -44,6 +44,9 @@
           lua-language-server
           stylua
           vscode-json-languageserver
+
+          alejandra
+          nixd
         ];
       };
     });
