@@ -9,3 +9,5 @@ vim.lsp.enable({
   "ruby_lsp",
   "stylua",
 })
+
+vim.lsp.inlay_hint.enable()
