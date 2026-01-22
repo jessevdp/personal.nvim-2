@@ -11,3 +11,11 @@ vim.lsp.enable({
 })
 
 vim.lsp.inlay_hint.enable()
+
+vim.api.nvim_create_autocmd("LspAttach", {
+  callback = function()
+    vim.keymap.set("n", "gqB", function()
+      vim.lsp.buf.format({ async = false })
+    end)
+  end,
+})
