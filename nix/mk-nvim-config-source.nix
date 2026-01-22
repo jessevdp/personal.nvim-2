@@ -26,6 +26,8 @@
     "spell/" ####### spell checking files (:h spell)
     "syntax/" ###### syntax files (:h mysyntaxfile)
     "tutor/" ####### tutorial files (:h Tutor)
+
+    "nvim-pack-lock.json" # vim.pack lockfile
   ];
 
   relativeEntries = map (entry: lib.path.append root entry) entries;
