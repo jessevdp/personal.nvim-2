@@ -46,6 +46,7 @@
           vscode-json-languageserver
 
           alejandra
+          nil
           nixd
         ];
       };
