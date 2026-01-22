@@ -5,6 +5,7 @@ vim.pack.add({
 vim.lsp.enable({
   "jsonls",
   "lua_ls",
+  "nixd",
   "ruby_lsp",
   "stylua",
 })
