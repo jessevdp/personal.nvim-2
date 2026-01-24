@@ -1,5 +1,9 @@
-{ wrappers, ... }:
-wrappers.lib.wrapModule ({config, lib, ...}: let
+{wrappers, ...}:
+wrappers.lib.wrapModule ({
+  config,
+  lib,
+  ...
+}: let
   mkNvimConfigSource = import ./mk-nvim-config-source.nix {
     inherit (config) pkgs;
   };
