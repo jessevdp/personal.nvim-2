@@ -6,6 +6,7 @@ vim.opt.updatetime = 500
 vim.o.exrc = true
 vim.o.secure = true
 
+require("config.completion")
 require("config.indentation")
 require("config.mouse")
 require("config.quickfix")
@@ -13,9 +14,9 @@ require("config.scroll")
 require("config.search")
 require("config.splits")
 require("config.terminal")
+require("config.ui")
 require("config.undo")
 require("config.wrapping")
-require("config.ui")
 
 require("config.treesitter")
 require("config.lsp")
