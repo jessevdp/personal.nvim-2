@@ -22,6 +22,7 @@ require("config.treesitter")
 require("config.lsp")
 
 require("config.colorscheme")
+require("config.icons")
 
 require("config.notifications")
 require("config.dropbar")
