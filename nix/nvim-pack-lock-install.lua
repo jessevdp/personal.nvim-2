@@ -121,9 +121,7 @@ end
 
 function Installer:confirm_replace()
   return Installer.confirm(
-    "Lockfile at "
-      .. self.target_path
-      .. " differs from source. Replace it? (backup will be created)"
+    "Lockfile at " .. self.target_path .. " differs from source. Replace it? (backup will be created)"
   )
 end
 

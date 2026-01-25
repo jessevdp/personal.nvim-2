@@ -4,7 +4,9 @@ vim.api.nvim_create_autocmd("CursorHold", {
   group = group,
   desc = "Highlight references under cursor",
   callback = function()
-    if vim.fn.mode() == "i" then return end
+    if vim.fn.mode() == "i" then
+      return
+    end
 
     local clients = vim.lsp.get_clients({ bufnr = 0 })
     local supports_highlight = false

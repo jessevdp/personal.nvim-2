@@ -41,13 +41,12 @@
 
       devShells.default = pkgs.mkShell {
         packages = with pkgs; [
-          lua-language-server
-          stylua
-          vscode-json-languageserver
-
           alejandra
+          lua-language-server
           nil
           nixd
+          stylua
+          vscode-json-languageserver
         ];
         shellHook =
           # sh

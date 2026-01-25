@@ -12,4 +12,3 @@ require("oil").setup({
 require("oil-git").setup({})
 
 vim.keymap.set("n", "-", "<cmd>Oil<CR>")
-
