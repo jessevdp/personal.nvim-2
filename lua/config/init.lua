@@ -21,6 +21,7 @@ require("config.wrapping")
 require("config.treesitter")
 require("config.lsp")
 
+require("config.notifications")
 require("config.dropbar")
 require("config.explorer")
 require("config.picker")
