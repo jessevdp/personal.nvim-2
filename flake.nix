@@ -28,8 +28,7 @@
       };
 
       wrapNvim = import ./nix/wrap-nvim.nix {inherit wrappers;};
-    in {
-      packages.default =
+      nvimWrapped =
         (wrapNvim.apply {
           inherit pkgs;
           name = "nvim-wrapped-jessevdp";
@@ -38,9 +37,11 @@
             tree-sitter # for nvim-treesitter
           ];
         }).wrapper;
+    in {
+      packages.default = nvimWrapped;
 
       checks = import ./nix/checks {
-        inherit pkgs;
+        inherit pkgs nvimWrapped;
         src = ./.;
       };
 
