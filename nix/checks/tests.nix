@@ -4,6 +4,8 @@
 }: let
   packLockfileSourcePath = nvimWrapped.configuration.packLockfileSourcePath;
 
+  helpersFile = ./test-helpers.lua;
+
   mkTest = {
     name,
     setup ? "",
@@ -13,6 +15,7 @@
       pkgs.writeText "setup-${name}.lua"
       # lua
       ''
+        test_helpers.mockNotify()
         ${setup}
       '';
 
@@ -48,6 +51,7 @@
       export XDG_CONFIG_HOME="$HOME/.config"
 
       nvim --headless \
+        --cmd "luafile ${helpersFile}" \
         --cmd "luafile ${setupFile}" \
         -c "luafile ${testFile}"
 
