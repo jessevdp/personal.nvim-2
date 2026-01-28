@@ -17,8 +17,8 @@ wrappers.lib.wrapModule ({
     # lua
     ''
       dofile([[${./nvim-pack-lock-install.lua}]]).run({
-        source_path = [[${configSource}/nvim-pack-lock.json]],
-        wanst_symlink = false,
+        source_path = [[${config.packLockfileSourcePath}]],
+        wants_symlink = false,
       })
 
       vim.env.MYVIMRC = [[${configSource}/init.lua]]
@@ -37,6 +37,13 @@ in {
     configRoot = lib.mkOption {
       type = lib.types.path;
       description = "Path to your '~/.config/nvim'-like tree.";
+    };
+
+    packLockfileSourcePath = lib.mkOption {
+      type = lib.types.path;
+      readOnly = true;
+      default = "${configSource}/nvim-pack-lock.json";
+      description = "Path to the vim.pack lockfile";
     };
 
     gitPackage = lib.mkOption {
