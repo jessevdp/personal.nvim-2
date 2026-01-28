@@ -39,6 +39,11 @@
           ];
         }).wrapper;
 
+      checks = import ./nix/checks {
+        inherit pkgs;
+        src = ./.;
+      };
+
       devShells.default = pkgs.mkShell {
         packages = with pkgs; [
           alejandra
