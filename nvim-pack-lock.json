@@ -9,23 +9,23 @@
       "src": "https://github.com/j-hui/fidget.nvim"
     },
     "fzf-lua": {
-      "rev": "95f6baea73d0440a28c55d370d424ac645b447a0",
+      "rev": "e5804f4924cf74ad03834c25988998a273ae0d7b",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gruvbox.nvim": {
-      "rev": "9d913a0c2a6e7a0b5b7412c392c66e5582d49b36",
-      "src": "https://gitlab.com/motaz-shokry/gruvbox.nvim"
+      "rev": "02c40782ac2b212e4bd304e8a74fe6d15b54b248",
+      "src": "https://gitlab.com/motaz-shokry/gruvbox.nvim.git"
     },
     "lazydev": {
       "rev": "5231c62",
       "src": "https://github.com/folke/lazydev.nvim"
     },
     "nvim-lspconfig": {
-      "rev": "419b082102fa813739588dd82e19a8b6b2442855",
+      "rev": "3f58aeca0c6ece8a9fb8782ea3fcb6024f285be3",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-treesitter": {
-      "rev": "b67d29ce748c3c488485a4733e16acda0ec8d09e",
+      "rev": "4967fa48b0fe7a7f92cee546c76bb4bb61bb14d5",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter",
       "version": "'main'"
     },
@@ -34,7 +34,7 @@
       "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "oil-git.nvim": {
-      "rev": "d153b6aa67f69fd80b43228ca899daec5602e652",
+      "rev": "c99db7b1dd8dd500c3ec530dc07000dfbeb6e080",
       "src": "https://github.com/malewicz1337/oil-git.nvim"
     },
     "oil.nvim": {
