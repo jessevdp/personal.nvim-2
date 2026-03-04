@@ -12,20 +12,29 @@ wrappers.lib.wrapModule ({
     root = config.configRoot;
   };
 
-  nvimInit =
-    config.pkgs.writeText "nvim-init.lua"
+  wrappedInit =
+    config.pkgs.writeText "${config.name}-init.lua"
     # lua
     ''
       dofile([[${./nvim-pack-lock-install.lua}]]).run({
         source_path = [[${configSource}/nvim-pack-lock.json]],
-        wanst_symlink = false,
+        wants_symlink = false,
       })
 
-      vim.env.MYVIMRC = [[${configSource}/init.lua]]
-      vim.opt.runtimepath:prepend([[${configSource}]])
-      vim.opt.runtimepath:append([[${configSource}/after]])
+      dofile([[${configSource}/init.lua]])
+    '';
 
-      vim.cmd.source([[${configSource}/init.lua]])
+  # XDG_CONFIG_DIRS expects <dir>/<appname>/.
+  xdgConfigDir =
+    config.pkgs.runCommand "xdg-config-${config.name}" {}
+    # sh
+    ''
+      mkdir -p "$out/${config.name}"
+      for f in ${configSource}/*; do
+        [ "$(basename "$f")" = "init.lua" ] && continue
+        ln -s "$f" "$out/${config.name}/"
+      done
+      ln -s ${wrappedInit} "$out/${config.name}/init.lua"
     '';
 in {
   options = {
@@ -53,7 +62,7 @@ in {
     package = config.pkgs.neovim;
     env = {
       NVIM_APPNAME = "\${NVIM_APPNAME:-${config.name}}";
-      VIMINIT = "luafile ${nvimInit}";
+      XDG_CONFIG_DIRS = "${xdgConfigDir}\${XDG_CONFIG_DIRS:+:\$XDG_CONFIG_DIRS}";
     };
     extraPackages = [
       config.ripgrepPackage
