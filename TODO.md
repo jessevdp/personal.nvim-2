@@ -1,0 +1,23 @@
+- [ ] Use fff.nvim for file search & live grep
+- [ ] Update gruvbox theme and remove custom highlights that I upstreamed. (Are they all upstreamed?)
+- [ ] Syntax for embedded languages (nix strings of lua etc, ruby heredoc, etc)
+- [ ] Use fixed NVIM_APPNAME compatible XDG_CONFIG_DIRS for wrapping
+- [ ] Fix empty dropbar "row" when in Oil buffer in CWD: maybe full path from home to CWD? (and full path if not in home?) or something to indicate "we're in nvim's CWD"
+- [ ] Treesitter Context
+- [ ] Textobjecs (treesitter + other semantic ones: q any quotes, B whole buffer, etc.)
+- [ ] treewalker mode (hydra?)
+- [ ] Leap/flash/easymotion
+- [ ] Git signs / hunks / line blame
+- [ ] Git merge conflicts highlighting + resolve + git jump (merge / diff bindings)
+- [ ] Auto fix whitespace errors
+- [ ] Quickly copy reference to the current file (relative path, full path, with/without line number, maybe even ranges? maybe on git host?)
+- [ ] Make sure jbuilder is seen as ruby code
+- [ ] statusline
+- [ ] "home page"
+- [ ] Session management
+- [ ] zsh highlighting when using zsh edit command line
+- [ ] keymap hints
+- [ ] Markdown rendering
+  - [ ] Automatically wrap lines in markdown files (except code blocks? and maybe remap hjkl movement to be more natural?)
+  - [ ] Preview rendered markdown?
+- [ ] vim abolish? for find/replace variants & change-casing keybinds?
