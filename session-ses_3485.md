@@ -2,7 +2,7 @@
 
 **Session ID:** ses_3485f73fdffeMz2pjdmdugjkDr
 **Created:** 3/4/2026, 7:54:38 AM
-**Updated:** 3/4/2026, 12:48:09 PM
+**Updated:** 3/4/2026, 12:53:05 PM
 
 ---
 
@@ -4659,6 +4659,181 @@ Wrote file successfully.
 Plan updated. Cross-cutting concerns cleaned up. The `q` + surround integration noted as a requirement.
 
 Ready to go feature by feature on requirements. Want to start from the top (#1 file picker)?
+
+---
+
+## User
+
+lets keep "possible plugins" per feature too in the plan: just as a start of what to explore.
+for cross cutting concerns I'd like a little more context on what we even mean.
+maybe for each feature that's part of one: list it for the feature too. (maybe later as we add requirements)
+
+constraint should not be part of "cross cutting concerns"
+
+maybe just "note on multiplexer" and reference that in each feature that touches the multiplexer.
+
+---
+
+verification: that "works via clone in ..." part etc. that's mostly solved. nvim is wrapped, we're now just putting plugins inside of it and modifying its behavior / settings.
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 3.1s)
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md"
+}
+```
+
+**Output:**
+```
+<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
+<type>file</type>
+<content>1: # Neovim Config: Road to Daily Driver
+2: 
+3: ## Structure
+4: 
+5: **Keep current structure.** `lua/config/` for feature config. `plugin/` for standalone autocmds. New features: one file per feature in `lua/config/`, added to the require chain.
+6: 
+7: ---
+8: 
+9: ## Fixes (existing config)
+10: 
+11: - Dropbar empty row in Oil at CWD
+12: - Gruvbox: remove upstreamed custom highlights
+13: - Embedded language syntax: verify if still an issue
+14: 
+15: ---
+16: 
+17: ## Cross-Cutting Concerns
+18: 
+19: **Git** — signs, blame, hunks, conflicts, diff, navigation. One domain, many features.
+20: 
+21: **Toggleable UI** — things you turn on/off. Context, blame, zen, inlay hints, diagnostics, etc. Needs consistent keybind pattern.
+22: 
+23: **Custom modes** — submodes with first-party feel. Show in statusline, clean enter/exit. Treewalker, window resize, hunk review(?).
+24: 
+25: **Text operations** — surround, split/join, coercion, swap/reorder. Structured manipulation. Might share keybind pattern. `q` textobject should work in surround too (`csq"` = change surrounding any-quotes to double-quotes).
+26: 
+27: **Constraint: Multiplexer** — pane navigation and test running depend on terminal multiplexer. Currently zellij, planning to return to tmux. Solution must not be tied to one.
+28: 
+29: ---
+30: 
+31: ## Must Have
+32: 
+33: 1. File picker & grep (fff.nvim, decided)
+34: 2. Git signs
+35: 3. Git inline blame (toggleable)
+36: 4. Git hunk navigation (in-buffer + cross-file via quickfix)
+37: 5. Git hunk actions (stage, reset, preview)
+38: 6. Git hunk textobject (`ih`)
+39: 7. Textobjects (treesitter: function def, function call, class, ruby block, argument/arguments, md fences. Custom: whole buffer, any quotes)
+40: 8. Swap / reorder (arguments, method definitions)
+41: 9. Surround (add, change, remove — quotes, braces, tags, function calls. `q` for any-quotes should work here too)
+42: 10. Split / join
+43: 11. Indentation guides
+44: 12. Treesitter context (toggleable)
+45: 13. Incremental selection (expand/shrink by semantic scope)
+46: 14. Jbuilder = ruby filetype
+47: 15. Trailing whitespace (requirements TBD — auto? command? highlight? explore)
+48: 16. Markdown (wrapping, in-buffer rendering, markdown-specific textobjects)
+49: 17. Copy file reference (`file:line`, rspec-compatible. Maybe: visual line ranges, git host URL)
+50: 18. Fast motions (2-char jump)
+51: 19. Motion repeat (`;`/`,` for all `]`/`[` motions)
+52: 20. Diagnostics (improve display/navigation)
+53: 21. Statusline (git status, diagnostics, line/col, filetype, mode shortened)
+54: 22. Key hints
+55: 23. Buffer close (quick keybind. Preserve layout is maybe — explore)
+56: 24. Git merge conflict highlighting (resolve.nvim, decided)
+57: 25. Git merge conflict navigation (`git jump merge` → quickfix)
+58: 26. Git merge conflict resolution (resolve.nvim, decided)
+59: 27. Zsh edit-command-line highlighting
+60: 
+61: **Nice to Have:**
+62: 
+63: 28. Change case / coercion
+64: 29. Smart find/replace (subvert)
+65: 30. Treewalker mode (in a submode)
+66: 31. Markdown code block ergonomics (indentation, split/join inside fences)
+67: 32. Quickfix improvements (styling, context preview, filtering)
+68: 33. Tmux/zellij pane navigation (multiplexer-dependent)
+69: 34. Home page / dashboard
+70: 35. Todo/fixme/hack highlighting in comments
+71: 36. Spell checking (for markdown — built-in `vim.opt.spell`)
+72: 37. Session / workspace management
+73: 
+74: **Maybe / Explore:**
+75: 
+76: 38. Cmdheight 0 (needs search count, macro in statusline — what else?)
+77: 39. Fast motion extras (remote yank/delete/change, treesitter selection)
+78: 40. Git diff in buffer (see deletions, what changed — mostly use lazygit)
+79: 41. Snippets (explore integration with built-in ctrl-x completion)
+80: 42. Align text
+81: 43. Zen mode
+82: 44. Folds
+83: 45. AI assistance (inline, not agent-level)
+84: 46. Test framework integration (multiplexer-dependent)
+85: 47. LSP status in statusline (fidget exists — more needed?)
+86: 
+87: ---
+88: 
+89: ## Feature Requirements
+90: 
+91: *To be filled in feature by feature.*
+92: 
+93: ---
+94: 
+95: ## Implementation Approach
+96: 
+97: For each feature:
+98: 1. Create/edit the config file
+99: 2. `vim.pack.add()` if needed
+100: 3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.
+101: 4. Test in real editing
+102: 5. `nix flake check`
+103: 
+104: One feature at a time. Live with it. Adjust. Next.
+105: 
+106: ## Verification
+107: 
+108: - `nix flake check` passes after each change
+109: - Works via `nix run .`
+110: - Works via clone to `~/.config/nvim`
+
+(End of file - total 110 lines)
+</content>
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 32.5s)
+
+**Tool: write**
+
+**Input:**
+```json
+{
+  "content": "# Neovim Config: Road to Daily Driver\n\n## Structure\n\n**Keep current structure.** `lua/config/` for feature config. `plugin/` for standalone autocmds. New features: one file per feature in `lua/config/`, added to the require chain.\n\n---\n\n## Fixes (existing config)\n\n- Dropbar empty row in Oil at CWD\n- Gruvbox: remove upstreamed custom highlights\n- Embedded language syntax: verify if still an issue\n\n---\n\n## Cross-Cutting Concerns\n\nThese are domains where multiple features overlap. They inform keybind patterns, grouping, and how features relate — not implementation order.\n\n**Git** — Many features live in the git domain: signs, blame, hunks, conflicts, diff, navigation. They should feel like one cohesive system. Keybinds, commands, and toggles should be consistent across all git features.\n\n**Toggleable UI** — Several features are \"turn this on/off\": treesitter context, inline blame, zen mode, inlay hints, diagnostics virtual text, etc. Needs a consistent keybind pattern so you don't have to remember per-feature toggles.\n\n**Custom modes** — Some features want a submode: press a key to enter, stay in that mode, press keys without a prefix, exit cleanly. Should feel first-party: show mode in statusline, clean enter/exit. Treewalker is the obvious candidate. Window resize and hunk review are others.\n\n**Text operations** — Surround, split/join, coercion, swap/reorder are all structured text manipulation. They might share a keybind pattern or at least live nearby. `q` textobject should work in surround too (`csq\"` = change surrounding any-quotes to double-quotes) for least surprise.\n\n---\n\n## Note on Multiplexer\n\nSome features depend on the terminal multiplexer (pane navigation, test runner). Currently using zellij, planning to go back to tmux. Solution must not be tied to one specific multiplexer. Referenced where relevant below.\n\n---\n\n## Must Have\n\n1. File picker & grep (fff.nvim, decided)\n2. Git signs\n3. Git inline blame (toggleable)\n4. Git hunk navigation (in-buffer + cross-file via quickfix)\n5. Git hunk actions (stage, reset, preview)\n6. Git hunk textobject (`ih`)\n7. Textobjects (treesitter: function def, function call, class, ruby block, argument/arguments, md fences. Custom: whole buffer, any quotes)\n8. Swap / reorder (arguments, method definitions)\n9. Surround (add, change, remove — quotes, braces, tags, function calls. `q` for any-quotes should work here too)\n10. Split / join\n11. Indentation guides\n12. Treesitter context (toggleable)\n13. Incremental selection (expand/shrink by semantic scope)\n14. Jbuilder = ruby filetype\n15. Trailing whitespace (requirements TBD — auto? command? highlight? explore)\n16. Markdown (wrapping, in-buffer rendering, markdown-specific textobjects)\n17. Copy file reference (`file:line`, rspec-compatible. Maybe: visual line ranges, git host URL)\n18. Fast motions (2-char jump)\n19. Motion repeat (`;`/`,` for all `]`/`[` motions)\n20. Diagnostics (improve display/navigation)\n21. Statusline (git status, diagnostics, line/col, filetype, mode shortened)\n22. Key hints\n23. Buffer close (quick keybind. Preserve layout is maybe — explore)\n24. Git merge conflict highlighting (resolve.nvim, decided)\n25. Git merge conflict navigation (`git jump merge` → quickfix)\n26. Git merge conflict resolution (resolve.nvim, decided)\n27. Zsh edit-command-line highlighting\n\n**Possible plugins per feature:**\n- 1: `fff.nvim` (decided)\n- 2–6: `gitsigns.nvim`\n- 7: `nvim-treesitter-textobjects`, `mini.ai`, `nvim-various-textobjs` (can mix)\n- 8: `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`\n- 9: `mini.surround`, `nvim-surround`\n- 10: `treesj`, `mini.splitjoin`\n- 11: `indent-blankline.nvim`, `mini.indentscope`\n- 12: `nvim-treesitter-context`\n- 13: built-in `vim.treesitter.incremental_selection`, or plugin\n- 14: built-in `vim.filetype.add`\n- 15: TBD\n- 16: `markview.nvim`, `render-markdown.nvim` + ftplugin settings\n- 17: hand-rolled utility\n- 18: `leap.nvim`, `flash.nvim`\n- 19: `demicolon.nvim`, `vim-remotions`\n- 20: built-in + config, `trouble.nvim`\n- 21: `mini.statusline`, `lualine.nvim`, hand-rolled\n- 22: `which-key.nvim`\n- 23: `bufdel.nvim`, `mini.bufremove`, hand-rolled\n- 24–26: `resolve.nvim` (decided) + `git jump merge` utility\n- 27: ftplugin/autocmd (set ft to bash? investigate)\n\n## Nice to Have\n\n28. Change case / coercion\n29. Smart find/replace (subvert)\n30. Treewalker mode (in a submode)\n31. Markdown code block ergonomics (indentation, split/join inside fences)\n32. Quickfix improvements (styling, context preview, filtering)\n33. Tmux/zellij pane navigation (see: multiplexer note)\n34. Home page / dashboard\n35. Todo/fixme/hack highlighting in comments\n36. Spell checking (for markdown — built-in `vim.opt.spell`)\n37. Session / workspace management\n\n**Possible plugins per feature:**\n- 28–29: `vim-abolish` (powers both coercion and subvert)\n- 30: `treewalker.nvim` + custom mode (see: custom modes concern)\n- 31: investigate / ftplugin config\n- 32: `quicker.nvim`, built-in `cfilter` (`packadd cfilter`)\n- 33: `smart-splits.nvim` (see: multiplexer note)\n- 34: `mini.starter`, `alpha-nvim`, `dashboard-nvim`\n- 35: `todo-comments.nvim`\n- 36: built-in `vim.opt.spell`\n- 37: `mini.sessions`, built-in `mksession` wrapper\n\n## Maybe / Explore\n\n38. Cmdheight 0 (needs search count, macro in statusline — what else?)\n39. Fast motion extras (remote yank/delete/change, treesitter selection)\n40. Git diff in buffer (see deletions, what changed — mostly use lazygit)\n41. Snippets (explore integration with built-in ctrl-x completion)\n42. Align text\n43. Zen mode\n44. Folds\n45. AI assistance (inline, not agent-level)\n46. Test framework integration (see: multiplexer note)\n47. LSP status in statusline (fidget exists — more needed?)\n\n---\n\n## Feature Requirements\n\n*To be filled in feature by feature.*\n\n---\n\n## Implementation Approach\n\nFor each feature:\n1. Create/edit the config file\n2. `vim.pack.add()` if needed\n3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.\n4. Test in real editing\n5. `nix flake check`\n\nOne feature at a time. Live with it. Adjust. Next.\n\n## Verification\n\n- `nix flake check` passes after each change\n",
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md"
+}
+```
+
+**Output:**
+```
+Wrote file successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 4.0s)
+
+Done. Cross-cutting concerns now explain *what they mean*. Multiplexer is a separate note, not a concern. Plugin options listed per feature. Verification trimmed.
+
+Ready to go feature by feature on requirements — start at #1?
 
 ---
 
