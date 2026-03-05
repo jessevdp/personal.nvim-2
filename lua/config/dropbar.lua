@@ -35,6 +35,19 @@ require("dropbar").setup({
     end,
   },
   sources = {
+    path = {
+      relative_to = function(buf, win)
+        local ok, cwd = pcall(vim.fn.getcwd, win)
+        local base = ok and cwd or vim.fn.getcwd()
+        if vim.bo[buf].ft == "oil" then
+          local dir = require("oil").get_current_dir(buf)
+          if dir and vim.fn.fnamemodify(dir, ":p") == vim.fn.fnamemodify(base, ":p") then
+            return vim.fn.fnamemodify(base, ":h")
+          end
+        end
+        return base
+      end,
+    },
     terminal = {
       show_current = false,
     },
