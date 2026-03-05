@@ -2,664 +2,7 @@
 
 **Session ID:** ses_3485f73fdffeMz2pjdmdugjkDr
 **Created:** 3/4/2026, 7:54:38 AM
-**Updated:** 3/5/2026, 7:51:06 AM
-
----
-
-## User
-
-no the special mapping can not be removed. some formatters don't support line based formatting and need an entire file. the B here is like -> OK the "whole buffer" textobject thing basically means "this file"
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 9.1s)
-
-
-
-Ah right — `gq` normally works line-by-line with the LSP range formatting, but some formatters need the whole file passed at once. The `gqB` mapping isn't `gq` operator + `B` motion — it's a dedicated "format entire file" command that happens to use a memorable keybind. The `B` textobject is separate: it just means "select everything in this buffer" for use with any operator (`d`, `y`, `c`, etc.).
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "- `B` — whole buffer (select everything). Note: `gqB` already exists as a dedicated LSP format-whole-file mapping — that's separate, some formatters need the entire file not line ranges. The `B` textobject is for general use with any operator (`dB`, `yB`, etc.).",
-  "oldString": "- `B` — whole buffer. Note: `gqB` already exists as a special mapping for LSP format-whole-buffer. With a proper `B` textobject, `gqB` would work naturally via the `gq` operator and the special mapping can be removed."
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 7.0s)
-
-**#8 — Swap / reorder:**
-
-Swap arguments left/right, swap method definitions up/down. What keybinds did you have in mind? Some common patterns:
-- `>a`/`<a` to swap argument right/left (overloads indent operators contextually — might be confusing)
-- `]e`/`[e` style bracket motions to "exchange" things
-- Something under the text operations grouping
-
-And for method definitions — is that "move this entire function up/down past the next sibling function"? Or more like "swap with the one above/below"?
-
----
-
-## User
-
-for markdown: i'd even want a "max width" type setup usually.
-neovim can't really do that. perhaps zen mode helps.
-but a max width of like 80 columns really nice when editing markdown on a wide screen so I don't have to move my head side to side
-a "soft wrap" max that is. neovim can wrap at 80 but that's hard wrapping.
-
-(this just came to me so I thought I'd mention before I forget. Make note of it?)
-
----
-
-its a text operation I suppose.
-not sure what the binds should be.
-but swapping things are "move" operations
-assuming we're basing this in my current surround preference:
-gsaiw'
-we might do
-gmf "go move function (forward)" and gmF "go move function (backward)
-that slightly violates f = function use and F is function definition...
-but it makes sense in the n/N type forward/backward sense.
-and "moving function use" makes no sense.
-
-is gm... taken?
-
-the whole "text operations" thing is hard.
-gs for surround means we can't use it for "split"
-
-to be refined...
-
-> is that "move this entire function up/down past the next sibling function"? Or more like "swap with the one above/below"?
-
-what is the difference?
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 18.6s)
-
-**Markdown max-width:** Noted. Neovim has no "soft wrap at column 80" — `wrap` wraps at window edge, `textwidth` hard-wraps. Zen mode solves this by creating a narrow centered window. I'll add it to the markdown requirements.
-
-**`gm` is taken** — stock neovim: `gm` moves cursor to horizontal middle of the screen line. `gM` moves to middle of the text line. So `gm` prefix would shadow that.
-
-**"Move past next sibling" vs "swap with one above/below"** — same thing, I was overcomplicating it. With functions A, B, C and cursor on B: "swap forward" → A, C, B. Same operation regardless of how you phrase it.
-
-The text operations keybind scheme is clearly not settled yet. Let me just note what we know and the open questions.
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "offset": 189,
-  "limit": 30
-}
-```
-
-**Output:**
-```
-<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
-<type>file</type>
-<content>189: **Possible plugins:** `gitsigns.nvim`
-190: 
-191: ### 7. Textobjects
-192: Relates to: **text operations** (`q` ties into surround).
-193: 
-194: **Requirements:**
-195: - `aF`/`iF` — function definition (`aM`/`iM` alias for method) (treesitter)
-196: - `af`/`if` — function call (`am`/`im` alias) (treesitter)
-197: - `ac`/`ic` — class/module (treesitter)
-198: - `ao`/`io` — block: ruby do..end/`{}`, markdown fenced code block (treesitter)
-199: - `` a` ``/`` i` `` — backtick-delimited: matches nearest code_span OR fenced_code_block (treesitter). Use `o` when you specifically want fenced block.
-200: - `ia`/`aa` — single argument (treesitter)
-201: - `iA`/`aA` — all arguments including parens for `aA` (treesitter)
-202: - `B` — whole buffer (select everything). Note: `gqB` already exists as a dedicated LSP format-whole-file mapping — that's separate, some formatters need the entire file not line ranges. The `B` textobject is for general use with any operator (`dB`, `yB`, etc.).
-203: - `q` — any quotes (nearest surrounding quote pair). Must also work in surround (`csq"` = change surrounding any-quotes to double-quotes).
-204: - `ii`/`ai` — indentation level. `ii` = all contiguous lines at same indent (including blank lines between them). `ai` = same + container lines above/below.
-205: - `ih` — git hunk (comes from git signs, not this feature)
-206: - Degrade gracefully: if treesitter query isn't available for a language, don't error. Fall back or silently do nothing.
-207: - Best-effort per language for function def vs call distinction.
-208: - Maybe: comment block textobject (contiguous comment lines). Key TBD. `@comment.outer` doesn't work well for multi-line `#` comments in Ruby — would need pattern-based approach.
-209: 
-210: **Possible plugins:** `nvim-treesitter-textobjects`, `mini.ai`, `nvim-various-textobjs` (can mix)
-211: 
-212: ---
-213: 
-214: ## Implementation Approach
-215: 
-216: For each feature:
-217: 1. Create/edit the config file
-218: 2. `vim.pack.add()` if needed
-
-(Showing lines 189-218 of 227. Use offset=219 to continue.)
-</content>
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 10.7s)
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "**Possible plugins:** `nvim-treesitter-textobjects`, `mini.ai`, `nvim-various-textobjs` (can mix)\n\n### 8. Swap / reorder\nRelates to: **text operations**.\n\n**Requirements:**\n- Swap arguments left/right (within an argument list)\n- Swap function/method definitions with the sibling above/below\n- Keybinds TBD. The text operations keybind scheme is unsettled:\n  - `gs` is currently surround, so can't reuse for swap\n  - `gm` is taken (stock: cursor to horizontal middle of screen line)\n  - Open question: find a `g`-prefixed home that doesn't clash, or use a different pattern entirely\n  - Forward/backward swap should feel like n/N or ]/[ — a directional pair\n\n**Possible plugins:** `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`",
-  "oldString": "**Possible plugins:** `nvim-treesitter-textobjects`, `mini.ai`, `nvim-various-textobjs` (can mix)"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.6s)
-
-Now add the soft-wrap note to the markdown feature summary:
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "16. Markdown (wrapping, in-buffer rendering, markdown-specific textobjects. Also: soft-wrap at ~80 columns on wide screens — nvim can't do this natively, zen mode solves it by narrowing the window)",
-  "oldString": "16. Markdown (wrapping, in-buffer rendering, markdown-specific textobjects)"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 4.4s)
-
-**#9 — Surround** next, or do you want to keep noodling on the text operations keybind scheme first?
-
----
-
-## User
-
-arguments aren't always left/right arguments can be multiline.
-btw, can it do both arguments as in when passing in
-and arguments in the function definition?
-left/right is next/prev semantically. depending on multiline or not.
-
-are we just moving methods & args?
-anything else we could want to move? probably not right? or am I overlooking something?
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 14.4s)
-
-
-
-You're right — "left/right" is wrong, it's next/prev sibling in the AST. Whether they're laid out horizontally or vertically doesn't matter.
-
-For arguments: yes, both call-site arguments and definition parameters are the same treesitter concept (`@parameter`). `def foo(a, b, c)` and `foo(x, y, z)` — swapping works in both contexts.
-
-What else could you want to swap? Thinking through it:
-- **Hash/object entries** — `{ a: 1, b: 2, c: 3 }` → swap `a: 1` with `b: 2`. Same structure as arguments really.
-- **Array/list elements** — `[1, 2, 3]` → same deal.
-- **Conditional branches** — swap if/elsif? Exotic. Probably not.
-- **Import statements** — reorder `require` lines? That's more of a sort operation.
-
-Arguments, parameters, hash entries, and array elements are all "comma-separated siblings" at the end of the day. A good swap implementation handles all of them since they share the same tree structure. Methods/functions are "block-level siblings" — different category.
-
-So really it's two kinds of swap:
-1. **Sibling elements** (args, params, hash entries, array items) — next/prev
-2. **Sibling blocks** (function/method definitions) — next/prev
-
-Both are "swap with adjacent sibling in the AST." The distinction is granularity, not mechanism.
-
-Anything else? I don't think so. Those two cover it.
-
-Want me to update #8 with this, then move to surround?
-
----
-
-## User
-
-yes but we don't have treesitter stuff for "array element" or "hash entry"
-in argument lists it sort of makes sense (although it is semantically more difficult. e.g. ruby has positional and keyword args so we have to get smart to get it right all the time. might be fine to ignore the details and just have the "semi OK" one there.
-
-really just "move method up/down" is the most used one probably.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 10.1s)
-
-
-
-True. Let me update #8 to reflect reality.
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "### 8. Swap / reorder\nRelates to: **text operations**.\n\n**Requirements:**\n- Swap function/method definitions with sibling above/below — primary use case\n- Swap arguments/parameters next/prev — nice to have. Best-effort; Ruby's mix of positional and keyword args may cause edge cases. Good enough is fine.\n- Could also apply to array elements, hash entries, etc. — same \"swap sibling\" concept but no dedicated treesitter queries for those. If it works, great.\n- Keybinds TBD. Text operations keybind scheme is unsettled:\n  - `gs` is currently surround, can't reuse\n  - `gm` is taken (stock: cursor to horizontal middle)\n  - Open question: find a home that doesn't clash\n  - Forward/backward swap should feel directional (like n/N or ]/[)\n\n**Possible plugins:** `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`",
-  "oldString": "### 8. Swap / reorder\nRelates to: **text operations**.\n\n**Requirements:**\n- Swap arguments left/right (within an argument list)\n- Swap function/method definitions with the sibling above/below\n- Keybinds TBD. The text operations keybind scheme is unsettled:\n  - `gs` is currently surround, so can't reuse for swap\n  - `gm` is taken (stock: cursor to horizontal middle of screen line)\n  - Open question: find a `g`-prefixed home that doesn't clash, or use a different pattern entirely\n  - Forward/backward swap should feel like n/N or ]/[ — a directional pair\n\n**Possible plugins:** `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 7.9s)
-
-**#9 — Surround:**
-
-You mentioned `gsaiw'` as your current pattern — `gs` prefix, then `a` for add. So:
-- `gsa{motion}{char}` — add surround
-- `gsd{char}` — delete surround
-- `gsr{old}{new}` — replace/change surround
-
-And `q` should work as a target meaning "any quotes."
-
-Anything else? Tags (`<div>`)? Function calls (`gsafprint` to wrap in `print()`)? HTML-specific stuff? How often do you actually use those if so?
-
----
-
-## User
-
-i don't really use those often, i just know that my current editor has them setup
-
-back to textobjects, i think it has a t for "tag" textobject too. in/arround.
-
-those are nice to have, not really must have.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 5.1s)
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "- Maybe: comment block textobject (contiguous comment lines). Key TBD. `@comment.outer` doesn't work well for multi-line `#` comments in Ruby — would need pattern-based approach.\n- Maybe: `it`/`at` — HTML/XML tag (built-in vim already has this, but could be enhanced)",
-  "oldString": "- Maybe: comment block textobject (contiguous comment lines). Key TBD. `@comment.outer` doesn't work well for multi-line `#` comments in Ruby — would need pattern-based approach."
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 11.5s)
-
-Actually — `it`/`at` for tags is already built into vim (`:h at`). So that's free. Might want to note that.
-
-Now for surround:
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "**Possible plugins:** `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`\n\n### 9. Surround\nRelates to: **text operations**. Shares `q` (any quotes) with textobjects.\n\n**Requirements:**\n- Add surround: `gsa{motion}{char}` (e.g. `gsaiw'` = surround inner word with single quotes)\n- Delete surround: `gsd{char}`\n- Replace surround: `gsr{old}{new}`\n- `q` works as a target — \"any/nearest quotes\" (matches textobject `q`)\n- Quotes, braces, parens, brackets are the core use case\n- Nice to have: tags (`<div>`), function calls. Not used often but nice if the plugin supports it.\n- Keybind prefix `gs` — already in use from current setup. Needs to not clash with other text operations (swap, split/join, coercion).\n\n**Possible plugins:** `mini.surround`, `nvim-surround`",
-  "oldString": "**Possible plugins:** `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 2.9s)
-
-**#10 — Split / join** next?
-
----
-
-## User
-
-maybe note that the scheme for text opreations could change. g.. is a weird namepace. maybe we move it under leader or smth else after all.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.1s)
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "- Keybind prefix `gs` — currently in use from existing setup. The whole text operations keybind scheme may change. `g..` is a weird namespace — might move everything under `<leader>` or find a better pattern. To be refined when text operations (surround, swap, split/join, coercion) are considered together.",
-  "oldString": "- Keybind prefix `gs` — already in use from current setup. Needs to not clash with other text operations (swap, split/join, coercion)."
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.6s)
-
-**#10 — Split / join:**
-
-You said you use this regularly. Current binds are `<leader>c{s,S,j,J}` ("code split"). What do you need from it?
-
-- Toggle (single key to flip between forms) vs explicit split/join?
-- Cursor position: stay where you are, or move to the start of the changed region?
-- Any language-specific quirks? Ruby trailing commas, Lua table formatting, etc.?
-
----
-
-## User
-
-i'm pretty happy with the current plugin I use: treesj.
-s splits the current node, S splits it and all children
-j joins the current node if split, J does the same recursively to its children
-not sure where the cursor goes or anything.
-its already smart enough to convert ruby blocks from do; end; to { } and back.
-
-might be open to looking at other possible implementations. 
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.9s)
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "### 10. Split / join\nRelates to: **text operations**.\n\n**Requirements:**\n- Split current node to multi-line\n- Join current node to single-line\n- Recursive variants: split/join including all children\n- Language-aware: e.g. Ruby block `do..end` ↔ `{ }` conversion\n- Currently happy with treesj behavior. Open to alternatives.\n- Keybinds: currently `<leader>c{s,S,j,J}`. May change with text operations keybind scheme.\n\n**Possible plugins:** `treesj`, `mini.splitjoin`",
-  "oldString": "**Possible plugins:** `mini.surround`, `nvim-surround`"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 2.9s)
-
-**#11 — Indentation guides** next?
-
----
-
-## User
-
-sure
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 5.7s)
-
-
-
-Pretty simple feature. Vertical lines showing indent levels. Any specific wants?
-
-- Scope highlighting (highlight the guide for the current scope differently)?
-- Animate/fade or just static lines?
-- Should they show inside blank lines too (connect guides across empty lines)?
-- Current indent level only, or all levels?
-
----
-
-## User
-
-all levels
-current one highlighted, the rest very subtle
-that's scope highlighted I suppose? or is that something different?
-it should show inside blank lines yes.
-no need to fade or animate.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.2s)
-
-
-
-Scope highlighting = exactly what you described. The guide for the scope you're currently in is visually distinct, the rest are barely visible. Same thing.
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "### 11. Indentation guides\n\n**Requirements:**\n- Vertical lines at every indent level\n- Current scope's guide highlighted, the rest very subtle\n- Show through blank lines (connect guides across empty lines)\n- No animation\n\n**Possible plugins:** `indent-blankline.nvim`, `mini.indentscope`",
-  "oldString": "### 10. Split / join"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 5.1s)
-
-**#12 — Treesitter context:**
-
-Show current scope at top of buffer. You said toggleable. Anything beyond "show the enclosing function/class/block name at the top when scrolled past it"? Max lines? Click to jump?
-
----
-
-## User
-
-i think you just removed 10 split/join? on accident?
-"no animation" is not a requirement worth mentioning.
-
-for context view: i think this will come in handy when in rspec. i have some huge rswag files (which is rspec for OpenAPI / swagger) where it is really dificult to see the nested context I'm in. in this case it could be worth it to have like 10 lines of context or something ridiculous like that.
-
-it just needs to show it.
-maybe the navigation to "jump to context" is nice. who knows.
-
-since I also have the dropbar it probably won't be on all the time.
-that's a bit duplicate.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 3.7s)
-
-
-
-Good catch on split/join, let me fix that.
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "offset": 220
-}
-```
-
-**Output:**
-```
-<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
-<type>file</type>
-<content>220: - Keybinds TBD. Text operations keybind scheme is unsettled:
-221:   - `gs` is currently surround, can't reuse
-222:   - `gm` is taken (stock: cursor to horizontal middle)
-223:   - Open question: find a home that doesn't clash
-224:   - Forward/backward swap should feel directional (like n/N or ]/[)
-225: 
-226: **Possible plugins:** `nvim-treesitter-textobjects` (swap), `iswap.nvim`, `mini.move`
-227: 
-228: ### 9. Surround
-229: Relates to: **text operations**. Shares `q` (any quotes) with textobjects.
-230: 
-231: **Requirements:**
-232: - Add surround: `gsa{motion}{char}` (e.g. `gsaiw'` = surround inner word with single quotes)
-233: - Delete surround: `gsd{char}`
-234: - Replace surround: `gsr{old}{new}`
-235: - `q` works as a target — "any/nearest quotes" (matches textobject `q`)
-236: - Quotes, braces, parens, brackets are the core use case
-237: - Nice to have: tags (`<div>`), function calls. Not used often but nice if the plugin supports it.
-238: - Keybind prefix `gs` — currently in use from existing setup. The whole text operations keybind scheme may change. `g..` is a weird namespace — might move everything under `<leader>` or find a better pattern. To be refined when text operations (surround, swap, split/join, coercion) are considered together.
-239: 
-240: ### 11. Indentation guides
-241: 
-242: **Requirements:**
-243: - Vertical lines at every indent level
-244: - Current scope's guide highlighted, the rest very subtle
-245: - Show through blank lines (connect guides across empty lines)
-246: - No animation
-247: 
-248: **Possible plugins:** `indent-blankline.nvim`, `mini.indentscope`
-249: Relates to: **text operations**.
-250: 
-251: **Requirements:**
-252: - Split current node to multi-line
-253: - Join current node to single-line
-254: - Recursive variants: split/join including all children
-255: - Language-aware: e.g. Ruby block `do..end` ↔ `{ }` conversion
-256: - Currently happy with treesj behavior. Open to alternatives.
-257: - Keybinds: currently `<leader>c{s,S,j,J}`. May change with text operations keybind scheme.
-258: 
-259: **Possible plugins:** `treesj`, `mini.splitjoin`
-260: 
-261: ---
-262: 
-263: ## Implementation Approach
-264: 
-265: For each feature:
-266: 1. Create/edit the config file
-267: 2. `vim.pack.add()` if needed
-268: 3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.
-269: 4. Test in real editing
-270: 5. `nix flake check`
-271: 
-272: One feature at a time. Live with it. Adjust. Next.
-273: 
-274: ## Verification
-275: 
-276: - `nix flake check` passes after each change
-
-(End of file - total 276 lines)
-</content>
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 12.2s)
-
-I see — split/join ended up after indentation guides with a broken header. Let me fix the ordering and add context requirements.
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "### 10. Split / join\nRelates to: **text operations**.\n\n**Requirements:**\n- Split current node to multi-line\n- Join current node to single-line\n- Recursive variants: split/join including all children\n- Language-aware: e.g. Ruby block `do..end` ↔ `{ }` conversion\n- Currently happy with treesj behavior. Open to alternatives.\n- Keybinds: currently `<leader>c{s,S,j,J}`. May change with text operations keybind scheme.\n\n**Possible plugins:** `treesj`, `mini.splitjoin`\n\n### 11. Indentation guides\n\n**Requirements:**\n- Vertical lines at every indent level\n- Current scope's guide highlighted, the rest very subtle\n- Show through blank lines (connect guides across empty lines)\n\n**Possible plugins:** `indent-blankline.nvim`, `mini.indentscope`\n\n### 12. Treesitter context\nPart of: **toggleable UI**.\n\n**Requirements:**\n- Show enclosing scope(s) at top of buffer when scrolled past them\n- Generous max lines — useful in deeply nested rspec/rswag files where 10+ lines of context is genuinely needed\n- Toggleable — probably off by default since dropbar already shows breadcrumbs. Turn on when deep nesting makes it valuable.\n- Maybe: click/jump to the context line\n- **investigate:** does it play nice with dropbar? (both occupy top-of-buffer space)\n\n**Possible plugins:** `nvim-treesitter-context`",
-  "oldString": "### 11. Indentation guides\n\n**Requirements:**\n- Vertical lines at every indent level\n- Current scope's guide highlighted, the rest very subtle\n- Show through blank lines (connect guides across empty lines)\n- No animation\n\n**Possible plugins:** `indent-blankline.nvim`, `mini.indentscope`\nRelates to: **text operations**.\n\n**Requirements:**\n- Split current node to multi-line\n- Join current node to single-line\n- Recursive variants: split/join including all children\n- Language-aware: e.g. Ruby block `do..end` ↔ `{ }` conversion\n- Currently happy with treesj behavior. Open to alternatives.\n- Keybinds: currently `<leader>c{s,S,j,J}`. May change with text operations keybind scheme.\n\n**Possible plugins:** `treesj`, `mini.splitjoin`"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 2.5s)
-
-**#13 — Incremental selection** next?
-
----
-
-## User
-
-sure
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.7s)
-
-
-
-Expand/shrink selection by semantic scope. Press a key to go wider (expression → statement → block → function), press another to shrink back.
-
-- What keys? Common choices: `<C-space>` to expand, `<C-backspace>` or `<BS>` to shrink. Or `v` to expand from normal mode then keep pressing `v`? Some plugins overload `v` in visual mode to mean "expand."
-- Should it start from normal mode (entering visual) or only work once you're already in visual mode?
-
----
-
-## User
-
-random one: in visual mode if I > to indent -> it should `gv` so i don't lose selection. make a note of it?
-
----
-
-i previously used CTRL-ENTER in normal mode, ENTER in visual mode, and backspace to shrink.
-that's slightly unergonomic
-i think backspace is normally also already just "1 less character" right?
-so that's also overloading something?
-<C-space> might be good. and <C-backspace> is probably fine.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 4.2s)
-
-
-
-The visual mode indent thing — you already have that actually.
-
-**Tool: grep**
-
-**Input:**
-```json
-{
-  "pattern": "gv",
-  "include": "*.lua"
-}
-```
-
-**Output:**
-```
-Found 2 matches
-/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/lua/config/indentation.lua:
-  Line 6: vim.keymap.set("v", ">", ">gv")
-  Line 7: vim.keymap.set("v", "<", "<gv")
-```
+**Updated:** 3/5/2026, 1:19:10 PM
 
 ---
 
@@ -2098,7 +1441,1592 @@ maybe undotree? (i use the nvim built in one now)
 
 ---
 
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1)
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 21.2s)
+
+
+
+Good points. VSCode shows the language name in the bottom bar — clicking it lets you change it. It's basically the filetype indicator. They don't show the LSP server name explicitly. The language icon in the status bar serves double duty as "this is the filetype" and implicitly "LSP is working for this."
+
+So maybe: filetype icon IS the LSP indicator. If LSP is attached, the icon is there. If not... it's still there because it's the filetype. Maybe the icon color changes subtly when LSP is connected vs not? That might be overthinking it. You said you're not sure if it's helpful — probably skip the LSP-specific thing and keep filetype icon if you want it.
+
+For per-filetype statuslines — that's a real pattern. Oil, quickfix, undotree, help buffers, maybe the picker. They all want stripped-down statuslines showing only what's relevant.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "### 21. Statusline\nRelates to: **custom modes** (show active mode in statusline). Shared UI space: other features may add to it.\n\n**Requirements:**\n- Clean, minimal look. Color-coded groups.\n- Mode indicator: shortened (N/I/V/VB/VL), color-coded to match theme\n- Git: diff stats (+/-/~), color-coded\n- Filename with modified/unsaved indicator\n- Diagnostic counts (error/warn/info), color-coded\n- Line:column, % in file\n- Filetype with icon — maybe this doubles as a subtle LSP indicator (icon is there = filetype known). Skip explicit LSP server display.\n- Empty components don't show. No clutter — if no diagnostics, no diagnostic section. If no git, no git section.\n- Custom mode display: when in a submode (treewalker etc.), show it (see: custom modes concern).\n- Layout TBD — currently: left (mode | git | diagnostics | filename), right (filetype | % | line:col). Open to rearranging.\n- **Per-filetype statuslines:** some buffers need way less.\n  - Oil: just mode + current path (shortened — `~` for home, relative to CWD, no `oil://` prefix). Nothing on the right.\n  - Quickfix: title + entry count\n  - Undotree, help, picker: stripped-down, only what's relevant\n- Other features (cmdheight 0, AI) may add requirements to statusline later — those belong in their own sections, referencing statusline as shared space.\n\n**Possible plugins:** `mini.statusline`, `lualine.nvim`, hand-rolled",
+  "oldString": "### 21. Statusline\nRelates to: **custom modes** (show active mode in statusline).\n\n**Requirements:**\n- Clean, minimal look. Color-coded groups.\n- Mode indicator: shortened (N/I/V/VB/VL), color-coded to match theme\n- Git: diff stats (+/-/~), color-coded\n- Filename with modified/unsaved indicator\n- Diagnostic counts (error/warn/info), color-coded\n- Line:column, % in file\n- Filetype with icon\n- Maybe: LSP server name (subtle). Already have fidget for progress. Skip if too noisy.\n- Maybe: search count + macro recording indicator (needed if cmdheight 0, see #38)\n- Custom mode display: when in a submode (treewalker etc.), show it. Ties into custom modes concern.\n- Layout TBD — currently: left (mode | git | diagnostics | filename), right (filetype | % | line:col). Open to rearranging, e.g. diagnostics on the right with position info.\n\n**Possible plugins:** `mini.statusline`, `lualine.nvim`, hand-rolled"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 18.2s)
+
+**#22 — Key hints?**
+
+---
+
+## User
+
+can we make "statusline" a "shared place" too?
+how do we "reference" shared places?
+this to-do item is mostly about cleaning up the statusline with the stuff we already have.
+additional "features" can add stuff.
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 8.2s)
+
+
+
+Good distinction. The statusline feature (#21) is "set up a clean statusline with what we have." Other features reference it as a shared space to add their stuff.
+
+For referencing shared places — I think "Touches: **sign column**" or "Touches: **statusline**" like we already do for sign column works. Consistent pattern.
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "offset": 50,
+  "limit": 30
+}
+```
+
+**Output:**
+```
+<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
+<type>file</type>
+<content>50: 
+51: ---
+52: 
+53: ## Navigation Conventions
+54: 
+55: Bracket motions follow a consistent pattern:
+56: - `]x` — next
+57: - `[x` — previous
+58: - `]X` — last
+59: - `[X` — first
+60: 
+61: Applies to: hunks (`h`/`H`), diagnostics (`d`/`D`), quickfix (`q`/`Q`), and any future bracket motions.
+62: 
+63: All bracket motions should be repeatable with `;`/`,` (see feature #19).
+64: 
+65: ---
+66: 
+67: ## Must Have
+68: 
+69: 1. File picker & grep (fff.nvim, decided)
+70: 2. Git signs
+71: 3. Git inline blame (toggleable)
+72: 4. Git hunk navigation (in-buffer + cross-file via quickfix)
+73: 5. Git hunk actions (stage, reset, preview)
+74: 6. Git hunk textobject (`ih`)
+75: 7. Textobjects (treesitter: function def, function call, class, ruby block, argument/arguments, md fences. Custom: whole buffer, any quotes)
+76: 8. Swap / reorder (arguments, method definitions)
+77: 9. Surround (add, change, remove — quotes, braces, tags, function calls. `q` for any-quotes should work here too)
+78: 10. Split / join
+79: 11. Indentation guides
+
+(Showing lines 50-79 of 399. Use offset=80 to continue.)
+</content>
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.3s)
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "limit": 20,
+  "offset": 33
+}
+```
+
+**Output:**
+```
+<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
+<type>file</type>
+<content>33: Some features depend on the terminal multiplexer (pane navigation, test runner). Currently using zellij, planning to go back to tmux. Solution must not be tied to one specific multiplexer. Referenced where relevant below.
+34: 
+35: ---
+36: 
+37: ## Shared UI Spaces
+38: 
+39: Certain screen areas are written to by multiple features. They're not cross-cutting concerns but shared resources — features that touch them should be aware of each other.
+40: 
+41: **Sign column** — Git signs, diagnostic signs, marks, maybe todo highlights. Must not overlap or get too busy. Everything should fit cleanly.
+42: - Git signs: thin bars, staged vs unstaged visually distinct
+43: - Diagnostics: icons/signs (review what's there, clean up)
+44: - Marks: subtle, nice to have (see #38)
+45: - Todo/fixme: probably highlight in-line text, not signcol — open question
+46: 
+47: **Statusline** — Multiple features contribute info: git, diagnostics, mode, filetype. Covered by feature #21.
+48: 
+49: **Inlay hints / virtual text** — Diagnostics, inline blame, maybe LSP type hints. Can compete for visual space on the same line. Priority/toggle matters.
+50: 
+51: ---
+52: 
+
+(Showing lines 33-52 of 399. Use offset=53 to continue.)
+</content>
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 9.0s)
+
+The shared UI spaces section already lists statusline. Let me flesh it out to match what we now know, and trim the feature #21 to focus on "set up what we have."
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "**Statusline** — Multiple features contribute info. Base setup is feature #21. Other features may add components (custom modes, AI, cmdheight 0 extras). Per-filetype overrides needed (Oil, quickfix, undotree, help). Features that touch it should note \"Touches: **statusline**.\"",
+  "oldString": "**Statusline** — Multiple features contribute info: git, diagnostics, mode, filetype. Covered by feature #21."
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.2s)
+
+Now update #21 to frame it as "set up the base":
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "### 21. Statusline\nSet up the base statusline with what we already have. Other features add to it (see: **statusline** shared space).\n\n**Requirements:**",
+  "oldString": "### 21. Statusline\nRelates to: **custom modes** (show active mode in statusline). Shared UI space: other features may add to it.\n\n**Requirements:**"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 3.1s)
+
+Now — **#22 — Key hints?**
+
+---
+
+## User
+
+sure
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 12.4s)
+
+
+
+You said: show available keys after pressing a prefix. Maybe toggleable (the "maybe" was about whether toggling it is needed).
+
+- Is this "always show after a delay" or "I press a key to see hints"?
+- Stock which-key behavior: you press `<leader>`, wait ~300ms, popup appears showing all `<leader>` bindings. Is that the model you want?
+- Or more of an on-demand thing — like a `:KeyHints` command?
+- Should it work for all prefixes (`g`, `z`, `]`, `[`, `<C-w>`, etc.) or just `<leader>`?
+
+---
+
+## User
+
+i have which key right now and i barely use it anymore.
+it's just there, being in the way.
+
+when I do use it it is regarding niche features like viewing the contents of registers when i CTRL-R or something.
+i barely need to look keybinds up.
+it should work for all prefixes when we have it.
+maybe not auto trigger
+maybe a long delay?
+
+also: i currently use an "on the side" only pop-up so the thing doesn't get in the way too much.
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 14.1s)
+
+
+
+So it's more of a safety net than a daily tool. Long delay, side popup, all prefixes. Barely used but nice to have for the rare "what was that binding again" moment or register contents.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "### 22. Key hints\n\n**Requirements:**\n- Show available keys after pressing any prefix (`<leader>`, `g`, `z`, `]`, `[`, `<C-w>`, etc.)\n- Long delay before showing — don't get in the way. Safety net, not a daily tool.\n- Side popup (not center/bottom) to stay out of the way\n- Useful for niche things: register contents on `<C-r>`, marks, etc.\n- Maybe toggleable — or just the long delay is enough\n- Barely used but nice when needed\n\n**Possible plugins:** `which-key.nvim`",
+  "oldString": "**Possible plugins:** `mini.statusline`, `lualine.nvim`, hand-rolled"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 1296.7s)
+
+**#23 — Buffer close?**
+
+---
+
+## User
+
+you deleted text again...
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 4.1s)
+
+
+
+Sorry about that. Let me find what's missing.
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "offset": 365
+}
+```
+
+**Output:**
+```
+<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
+<type>file</type>
+<content>365: **Requirements:**
+366: - Clean, minimal look. Color-coded groups.
+367: - Mode indicator: shortened (N/I/V/VB/VL), color-coded to match theme
+368: - Git: diff stats (+/-/~), color-coded
+369: - Filename with modified/unsaved indicator
+370: - Diagnostic counts (error/warn/info), color-coded
+371: - Line:column, % in file
+372: - Filetype with icon — maybe this doubles as a subtle LSP indicator (icon is there = filetype known). Skip explicit LSP server display.
+373: - Empty components don't show. No clutter — if no diagnostics, no diagnostic section. If no git, no git section.
+374: - Custom mode display: when in a submode (treewalker etc.), show it (see: custom modes concern).
+375: - Layout TBD — currently: left (mode | git | diagnostics | filename), right (filetype | % | line:col). Open to rearranging.
+376: - **Per-filetype statuslines:** some buffers need way less.
+377:   - Oil: just mode + current path (shortened — `~` for home, relative to CWD, no `oil://` prefix). Nothing on the right.
+378:   - Quickfix: title + entry count
+379:   - Undotree, help, picker: stripped-down, only what's relevant
+380: - Other features (cmdheight 0, AI) may add requirements to statusline later — those belong in their own sections, referencing statusline as shared space.
+381: 
+382: ### 22. Key hints
+383: 
+384: **Requirements:**
+385: - Show available keys after pressing any prefix (`<leader>`, `g`, `z`, `]`, `[`, `<C-w>`, etc.)
+386: - Long delay before showing — don't get in the way. Safety net, not a daily tool.
+387: - Side popup (not center/bottom) to stay out of the way
+388: - Useful for niche things: register contents on `<C-r>`, marks, etc.
+389: - Maybe toggleable — or just the long delay is enough
+390: - Barely used but nice when needed
+391: 
+392: **Possible plugins:** `which-key.nvim`
+393: 
+394: ---
+395: 
+396: ## Implementation Approach
+397: 
+398: For each feature:
+399: 1. Create/edit the config file
+400: 2. `vim.pack.add()` if needed
+401: 3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.
+402: 4. Test in real editing
+403: 5. `nix flake check`
+404: 
+405: One feature at a time. Live with it. Adjust. Next.
+406: 
+407: ## Verification
+408: 
+409: - `nix flake check` passes after each change
+
+(End of file - total 409 lines)
+</content>
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 6.2s)
+
+I see — the statusline "Possible plugins" line is missing. It got replaced by the key hints section.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "- Other features (cmdheight 0, AI) may add requirements to statusline later — those belong in their own sections, referencing statusline as shared space.\n\n**Possible plugins:** `mini.statusline`, `lualine.nvim`, hand-rolled\n\n### 22. Key hints",
+  "oldString": "- Other features (cmdheight 0, AI) may add requirements to statusline later — those belong in their own sections, referencing statusline as shared space.\n\n### 22. Key hints"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 3.1s)
+
+Fixed. **#23 — Buffer close?**
+
+---
+
+## User
+
+did we ever end up specing out a "git diff" workflow?
+hunk preview is a micro diff in a floating window
+resolve merge conflict flow has diffs too. i believe those are in a floating window
+but just: show me the diff of this buffer type stuff?
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 11.9s)
+
+
+
+Not explicitly specced. Here's what we have git-diff-wise:
+
+- **Hunk preview** (#5) — micro diff in a float, shows what changed in a single hunk
+- **Merge conflict** (#24-26) — resolve.nvim's diff view for conflicts
+- **Git diff in buffer** (#40) — in the maybe/explore section, noted as "see deletions, what changed — mostly use lazygit"
+
+The gap is: "show me the full diff of this buffer vs HEAD" — like `:Gdiff` in fugitive. Side-by-side or inline view of all changes in the current file. You said you mostly use lazygit for this but it trips you up when you do try it in nvim.
+
+Is that something you want to spec out, or leave it in #40 as a maybe? The hunk preview float might be enough for "what changed here?" in most cases.
+
+---
+
+## User
+
+yeah #40 is fine
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 7.7s)
+
+
+
+**#23 — Buffer close:**
+
+You want `<leader>x` to close the current buffer quickly. Preserve window layout is a maybe. The annoying thing before was closing buffers would put the same buffer in two windows side-by-side.
+
+What's the minimum you need?
+- Just `:bd` mapped to `<leader>x`?
+- Or does it need to be smarter — like "close this buffer and show the previous buffer in this window"?
+- Do you close multiple buffers in a row often (the "xxxx cleanup" workflow you mentioned)?
+
+---
+
+## User
+
+yeah it would sometimes do that... annoying. it had a sort of alg where it did recency or something. but putting the same buffer side by side mid-way was annoying.
+
+is leaderx the best mapping? what do others use?
+
+i like the fact that I have something to close a buffer that preserves the window
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 11.7s)
+
+
+
+Common mappings for buffer close:
+- `<leader>x` — very common, you're not alone
+- `<leader>bd` — "buffer delete," more descriptive but longer
+- `<leader>q` — some people use this (but `q` is also macro recording and some use it for quit)
+- `<leader>c` — "close" but you had `<leader>c` as "code" prefix
+
+`<leader>x` is fine honestly. Short, memorable, doesn't conflict with anything obvious.
+
+For the "same buffer in two windows" problem — the fix is: when closing a buffer, replace it with the *previous* buffer in that window rather than falling back to whatever vim picks. And if that previous buffer is already visible in another window, go to the one before that. That's what bufdel/mini.bufremove do.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "**Possible plugins:** `which-key.nvim`\n\n### 23. Buffer close\n\n**Requirements:**\n- `<leader>x` to close current buffer\n- Preserve window layout — don't close the window, replace the buffer\n- Show previous buffer in that window, but avoid showing a buffer that's already visible in another window (the \"same buffer in two splits\" problem)\n- Should work for quick successive closes (the \"xxxx cleanup\" workflow)\n\n**Possible plugins:** `bufdel.nvim`, `mini.bufremove`, hand-rolled",
+  "oldString": "**Possible plugins:** `which-key.nvim`"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 4.6s)
+
+**#24-26 — Git merge conflicts** (resolve.nvim decided). Want to spec these out or are the requirements already clear enough from what we've discussed?
+
+---
+
+## User
+
+what requirements do you have?
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 12.0s)
+
+
+
+From what you've said so far:
+
+- **#24 Highlighting** — resolve.nvim (decided) for visual diff of conflict markers
+- **#25 Navigation** — `git jump merge` → quickfix to hop between all conflicts across files. Then just use normal quickfix navigation (`]q`/`[q`).
+- **#26 Resolution** — resolve.nvim's diffing features. Pick ours/theirs/both.
+
+Questions:
+- For resolve.nvim: have you used it before or is this based on the README? Any specific behavior you want from it?
+- Resolution keybinds: commands or keybinds? Something like `]x` to pick "ours" feels weird. Probably commands — you're not resolving conflicts at speed.
+- After resolving all conflicts in a file, auto-write? Or leave that manual?
+- The `git jump merge` → quickfix thing: is that a keybind or a command you run when you start a merge resolution session?
+
+---
+
+## User
+
+just basing what I know on the readme and some reddit thread about it. i asked the author to add some stuff
+(the highlighting part), he did.
+
+the idea is to color the background of ours/theirs/parent (i have 3 way diffing ususally)
+
+we need to decide on some way to get conflicts into the quickfix.
+maybe a user command is easiest? not something we need to bind.
+resolution is good to bind
+so is diffing
+
+maybe <leader>gx as namespace for g for git, x for "conflict".
+did we decide on a namespace for git related mappings yet? for hunk stuff?
+i think its fine to put all this in the <leader>g namespace since its not commonly used
+like not every edit
+aside from the h for git hunk textobject like stuff maybe.
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 9.6s)
+
+
+
+We haven't decided on a git namespace yet — but `<leader>g` makes sense. Let me think about what goes there:
+
+- `<leader>g` prefix for git stuff that's occasional (conflict resolution, blame toggle, etc.)
+- `]h`/`[h` stays as bracket motions for hunks (that's navigation, not `<leader>g`)
+- `ih` textobject stays as-is (operator-pending)
+- Hunk actions (stage, reset, preview) — these could go either way. `<leader>gh` prefix? Or `<leader>hs`/`<leader>hr`/`<leader>hp`?
+
+For conflicts specifically:
+- `:GitConflictsToQuickfix` or `:GitJumpMerge` — command, not bound
+- `<leader>gx` namespace for resolution: `<leader>gxo` ours, `<leader>gxt` theirs, `<leader>gxb` both? Or shorter?
+- Diffing: `<leader>gxd` to open the diff view?
+
+Those are long sequences though. `<leader>gxo` is 4 keys. Does that feel too heavy, or is it fine since you're not doing it at speed?
+
+---
+
+## User
+
+what does resolve.nvim suggest?
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 4.6s)
+
+**Tool: webfetch**
+
+**Input:**
+```json
+{
+  "url": "https://github.com/spacedentist/resolve.nvim",
+  "format": "markdown"
+}
+```
+
+**Output:**
+```
+                        GitHub - spacedentist/resolve.nvim: A Neovim plugin for resolving merge conflicts with conflict marker highlighting and resolution commands. · GitHub                                             
+
+[Skip to content](#start-of-content)   
+
+## Navigation Menu
+
+Toggle navigation
+
+[](/)
+
+[Sign in](/login?return_to=https%3A%2F%2Fgithub.com%2Fspacedentist%2Fresolve.nvim)
+
+Appearance settings
+
+  
+
+-   Platform
+    
+    -   AI CODE CREATION
+        
+        -   [
+            
+            GitHub CopilotWrite better code with AI
+            
+            ](https://github.com/features/copilot)
+        -   [
+            
+            GitHub SparkBuild and deploy intelligent apps
+            
+            ](https://github.com/features/spark)
+        -   [
+            
+            GitHub ModelsManage and compare prompts
+            
+            ](https://github.com/features/models)
+        -   [
+            
+            MCP RegistryNewIntegrate external tools
+            
+            ](https://github.com/mcp)
+        
+    -   DEVELOPER WORKFLOWS
+        
+        -   [
+            
+            ActionsAutomate any workflow
+            
+            ](https://github.com/features/actions)
+        -   [
+            
+            CodespacesInstant dev environments
+            
+            ](https://github.com/features/codespaces)
+        -   [
+            
+            IssuesPlan and track work
+            
+            ](https://github.com/features/issues)
+        -   [
+            
+            Code ReviewManage code changes
+            
+            ](https://github.com/features/code-review)
+        
+    -   APPLICATION SECURITY
+        
+        -   [
+            
+            GitHub Advanced SecurityFind and fix vulnerabilities
+            
+            ](https://github.com/security/advanced-security)
+        -   [
+            
+            Code securitySecure your code as you build
+            
+            ](https://github.com/security/advanced-security/code-security)
+        -   [
+            
+            Secret protectionStop leaks before they start
+            
+            ](https://github.com/security/advanced-security/secret-protection)
+        
+    -   EXPLORE
+        
+        -   [Why GitHub](https://github.com/why-github)
+        -   [Documentation](https://docs.github.com)
+        -   [Blog](https://github.blog)
+        -   [Changelog](https://github.blog/changelog)
+        -   [Marketplace](https://github.com/marketplace)
+        
+    
+    [View all features](https://github.com/features)
+    
+-   Solutions
+    
+    -   BY COMPANY SIZE
+        
+        -   [Enterprises](https://github.com/enterprise)
+        -   [Small and medium teams](https://github.com/team)
+        -   [Startups](https://github.com/enterprise/startups)
+        -   [Nonprofits](https://github.com/solutions/industry/nonprofits)
+        
+    -   BY USE CASE
+        
+        -   [App Modernization](https://github.com/solutions/use-case/app-modernization)
+        -   [DevSecOps](https://github.com/solutions/use-case/devsecops)
+        -   [DevOps](https://github.com/solutions/use-case/devops)
+        -   [CI/CD](https://github.com/solutions/use-case/ci-cd)
+        -   [View all use cases](https://github.com/solutions/use-case)
+        
+    -   BY INDUSTRY
+        
+        -   [Healthcare](https://github.com/solutions/industry/healthcare)
+        -   [Financial services](https://github.com/solutions/industry/financial-services)
+        -   [Manufacturing](https://github.com/solutions/industry/manufacturing)
+        -   [Government](https://github.com/solutions/industry/government)
+        -   [View all industries](https://github.com/solutions/industry)
+        
+    
+    [View all solutions](https://github.com/solutions)
+    
+-   Resources
+    
+    -   EXPLORE BY TOPIC
+        
+        -   [AI](https://github.com/resources/articles?topic=ai)
+        -   [Software Development](https://github.com/resources/articles?topic=software-development)
+        -   [DevOps](https://github.com/resources/articles?topic=devops)
+        -   [Security](https://github.com/resources/articles?topic=security)
+        -   [View all topics](https://github.com/resources/articles)
+        
+    -   EXPLORE BY TYPE
+        
+        -   [Customer stories](https://github.com/customer-stories)
+        -   [Events & webinars](https://github.com/resources/events)
+        -   [Ebooks & reports](https://github.com/resources/whitepapers)
+        -   [Business insights](https://github.com/solutions/executive-insights)
+        -   [GitHub Skills](https://skills.github.com)
+        
+    -   SUPPORT & SERVICES
+        
+        -   [Documentation](https://docs.github.com)
+        -   [Customer support](https://support.github.com)
+        -   [Community forum](https://github.com/orgs/community/discussions)
+        -   [Trust center](https://github.com/trust-center)
+        -   [Partners](https://github.com/partners)
+        
+    
+    [View all resources](https://github.com/resources)
+    
+-   Open Source
+    
+    -   COMMUNITY
+        
+        -   [
+            
+            GitHub SponsorsFund open source developers
+            
+            ](https://github.com/sponsors)
+        
+    -   PROGRAMS
+        
+        -   [Security Lab](https://securitylab.github.com)
+        -   [Maintainer Community](https://maintainers.github.com)
+        -   [Accelerator](https://github.com/accelerator)
+        -   [Archive Program](https://archiveprogram.github.com)
+        
+    -   REPOSITORIES
+        
+        -   [Topics](https://github.com/topics)
+        -   [Trending](https://github.com/trending)
+        -   [Collections](https://github.com/collections)
+        
+    
+-   Enterprise
+    
+    -   ENTERPRISE SOLUTIONS
+        
+        -   [
+            
+            Enterprise platformAI-powered developer platform
+            
+            ](https://github.com/enterprise)
+        
+    -   AVAILABLE ADD-ONS
+        
+        -   [
+            
+            GitHub Advanced SecurityEnterprise-grade security features
+            
+            ](https://github.com/security/advanced-security)
+        -   [
+            
+            Copilot for BusinessEnterprise-grade AI features
+            
+            ](https://github.com/features/copilot/copilot-business)
+        -   [
+            
+            Premium SupportEnterprise-grade 24/7 support
+            
+            ](https://github.com/premium-support)
+        
+    
+-   [Pricing](https://github.com/pricing)
+
+Search or jump to...
+
+# Search code, repositories, users, issues, pull requests...
+
+Search
+
+Clear
+
+[Search syntax tips](https://docs.github.com/search-github/github-code-search/understanding-github-code-search-syntax)
+
+# Provide feedback
+
+We read every piece of feedback, and take your input very seriously.
+
+ Include my email address so I can be contacted
+
+Cancel Submit feedback
+
+# Saved searches
+
+## Use saved searches to filter your results more quickly
+
+Name  
+
+Query 
+
+To see all available qualifiers, see our [documentation](https://docs.github.com/search-github/github-code-search/understanding-github-code-search-syntax).
+
+Cancel Create saved search
+
+[Sign in](/login?return_to=https%3A%2F%2Fgithub.com%2Fspacedentist%2Fresolve.nvim)
+
+[Sign up](/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E&source=header-repo&source_repo=spacedentist%2Fresolve.nvim)
+
+Appearance settings
+
+Resetting focus
+
+You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You switched accounts on another tab or window. Reload to refresh your session. Dismiss alert
+
+[spacedentist](/spacedentist) / **[resolve.nvim](/spacedentist/resolve.nvim)** Public
+
+-   [Notifications](/login?return_to=%2Fspacedentist%2Fresolve.nvim) You must be signed in to change notification settings
+-   [Fork 3](/login?return_to=%2Fspacedentist%2Fresolve.nvim)
+-   [Star 49](/login?return_to=%2Fspacedentist%2Fresolve.nvim)
+    
+
+-   [Code](/spacedentist/resolve.nvim)
+-   [Issues 2](/spacedentist/resolve.nvim/issues)
+-   [Pull requests 2](/spacedentist/resolve.nvim/pulls)
+-   [Actions](/spacedentist/resolve.nvim/actions)
+-   [Security 0](/spacedentist/resolve.nvim/security)
+-   [Insights](/spacedentist/resolve.nvim/pulse)
+
+Additional navigation options
+
+-   [Code](/spacedentist/resolve.nvim)
+-   [Issues](/spacedentist/resolve.nvim/issues)
+-   [Pull requests](/spacedentist/resolve.nvim/pulls)
+-   [Actions](/spacedentist/resolve.nvim/actions)
+-   [Security](/spacedentist/resolve.nvim/security)
+-   [Insights](/spacedentist/resolve.nvim/pulse)
+
+ [](/spacedentist/resolve.nvim)
+
+# spacedentist/resolve.nvim
+
+ master
+
+[Branches](/spacedentist/resolve.nvim/branches)[Tags](/spacedentist/resolve.nvim/tags)
+
+[](/spacedentist/resolve.nvim/branches)[](/spacedentist/resolve.nvim/tags)
+
+Go to file
+
+Code
+
+Open more actions menu
+
+## Folders and files
+
+Name
+
+Name
+
+Last commit message
+
+Last commit date
+
+## Latest commit
+
+## History
+
+[11 Commits](/spacedentist/resolve.nvim/commits/master/)
+
+[](/spacedentist/resolve.nvim/commits/master/)11 Commits
+
+[lua/resolve](/spacedentist/resolve.nvim/tree/master/lua/resolve "This path skips through empty directories")
+
+[lua/resolve](/spacedentist/resolve.nvim/tree/master/lua/resolve "This path skips through empty directories")
+
+[plugin](/spacedentist/resolve.nvim/tree/master/plugin "plugin")
+
+[plugin](/spacedentist/resolve.nvim/tree/master/plugin "plugin")
+
+[.gitignore](/spacedentist/resolve.nvim/blob/master/.gitignore ".gitignore")
+
+[.gitignore](/spacedentist/resolve.nvim/blob/master/.gitignore ".gitignore")
+
+[LICENSE](/spacedentist/resolve.nvim/blob/master/LICENSE "LICENSE")
+
+[LICENSE](/spacedentist/resolve.nvim/blob/master/LICENSE "LICENSE")
+
+[README.md](/spacedentist/resolve.nvim/blob/master/README.md "README.md")
+
+[README.md](/spacedentist/resolve.nvim/blob/master/README.md "README.md")
+
+View all files
+
+## Repository files navigation
+
+-   [README](#)
+-   [MIT license](#)
+
+# resolve.nvim
+
+[](#resolvenvim)
+
+A Neovim plugin for resolving merge conflicts with ease.
+
+resolve.mp4
+
+You can watch [a three-minute demo on YouTube](https://www.youtube.com/watch?v=8twR5lfrGN4)
+
+## Features
+
+[](#features)
+
+-   Automatically detect merge conflicts in buffers
+-   Semantic highlighting for both markers and content sections with automatic light/dark theme support
+-   Navigate between conflicts quickly
+-   Resolve conflicts with simple commands
+-   Support for standard 3-way merge and diff3 formats
+-   View diffs between base and each version separately or together in a floating window
+-   List all conflicts in quickfix window
+-   Buffer-local keymaps (only active in buffers with conflicts)
+-   Matchit integration for `%` jumping between conflict markers
+-   `<Plug>` mappings for easy custom keybinding
+-   Customisable hooks/callbacks on conflict detection
+
+## Development
+
+[](#development)
+
+This plugin was inspired by prior work:
+
+-   [conflict-marker.vim](https://github.com/rhysd/conflict-marker.vim)
+-   [git-conflict.nvim](https://github.com/akinsho/git-conflict.nvim)
+
+The feature I was missing in other plugins was a quick way to compare the local or remote side of the conflict with the common base (which is included in conflicted files if enabled, e.g. by the `merge.conflictStyle` setting in git set to `diff3`).
+
+Development was aided by Claude Code. Pull requests are welcome. If you use AI coding tools, please read and understand all code changes before submitting them as a PR.
+
+## Requirements
+
+[](#requirements)
+
+-   Neovim >= 0.9
+-   [delta](https://github.com/dandavison/delta) - required for diff view features (optional if you only use highlighting and conflict resolution)
+
+## Installation
+
+[](#installation)
+
+### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+[](#using-lazynvim)
+
+{
+  "spacedentist/resolve.nvim",
+  event \= { "BufReadPre", "BufNewFile" },
+  opts \= {},
+}
+
+### Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
+
+[](#using-packernvim)
+
+use {
+  "spacedentist/resolve.nvim",
+  config \= function()
+    require("resolve").setup()
+  end,
+}
+
+### Using [vim-plug](https://github.com/junegunn/vim-plug)
+
+[](#using-vim-plug)
+
+Plug 'spacedentist/resolve.nvim'
+
+lua << EOF
+  require("resolve").setup()
+EOF
+
+## Configuration
+
+[](#configuration)
+
+Default configuration:
+
+require("resolve").setup({
+  \-- Conflict marker patterns (Lua patterns, must match from start of line)
+  markers \= {
+    ours \= "^<<<<<<<+",      \-- Start of "ours" section
+    theirs \= "^>>>>>>>+",    \-- End of "theirs" section
+    ancestor \= "^|||||||+",  \-- Start of ancestor/base section (diff3)
+    separator \= "^=======+$", \-- Separator between sections
+  },
+  \-- Set to false to disable default keymaps
+  default\_keymaps \= true,
+  \-- Callback function called when conflicts are detected
+  \-- Receives: { bufnr = number, conflicts = table }
+  on\_conflict\_detected \= nil,
+  \-- Callback function called when all conflicts are resolved
+  \-- Receives: { bufnr = number }
+  on\_conflicts\_resolved \= nil,
+})
+
+### Theming and Highlights
+
+[](#theming-and-highlights)
+
+The plugin creates highlight groups for both conflict markers and their content sections, with semantic colours that automatically adapt to light/dark backgrounds:
+
+#### Marker Highlights (bold lines)
+
+[](#marker-highlights-bold-lines)
+
+Highlight Group
+
+Marker
+
+Dark Theme
+
+Light Theme
+
+Meaning
+
+`ResolveOursMarker`
+
+`<<<<<<<`
+
+Green tint
+
+Light green
+
+Your changes (keep)
+
+`ResolveTheirsMarker`
+
+`>>>>>>>`
+
+Blue tint
+
+Light blue
+
+Incoming changes
+
+`ResolveSeparatorMarker`
+
+`=======`
+
+Grey
+
+Light grey
+
+Neutral divider
+
+`ResolveAncestorMarker`
+
+`|||||||`
+
+Amber tint
+
+Light amber
+
+Original/base (diff3)
+
+All markers are displayed in **bold** with normal text colour and a tinted background.
+
+#### Section Highlights (content between markers)
+
+[](#section-highlights-content-between-markers)
+
+Highlight Group
+
+Section
+
+Dark Theme
+
+Light Theme
+
+Meaning
+
+`ResolveOursSection`
+
+Ours content
+
+Subtle green
+
+Very light green
+
+Your changes
+
+`ResolveTheirsSection`
+
+Theirs content
+
+Subtle blue
+
+Very light blue
+
+Incoming changes
+
+`ResolveAncestorSection`
+
+Base content
+
+Subtle amber
+
+Very light amber
+
+Original (diff3)
+
+The section highlights provide a subtle background tint to help visually distinguish which code belongs to which side.
+
+The highlights automatically update when you change colour schemes or toggle between light/dark backgrounds.
+
+#### Customising Highlights
+
+[](#customising-highlights)
+
+Override the highlight groups in your config to customise the appearance:
+
+\-- After calling setup(), override any highlights you want to change
+
+\-- Marker highlights (bold lines)
+vim.api.nvim\_set\_hl(0, "ResolveOursMarker", { bg \= "#3d5c3d", bold \= true })
+vim.api.nvim\_set\_hl(0, "ResolveTheirsMarker", { bg \= "#3d4d5c", bold \= true })
+vim.api.nvim\_set\_hl(0, "ResolveSeparatorMarker", { bg \= "#4a4a4a", bold \= true })
+vim.api.nvim\_set\_hl(0, "ResolveAncestorMarker", { bg \= "#5c4d3d", bold \= true })
+
+\-- Section highlights (content areas)
+vim.api.nvim\_set\_hl(0, "ResolveOursSection", { bg \= "#2a3a2a" })
+vim.api.nvim\_set\_hl(0, "ResolveTheirsSection", { bg \= "#2a2f3a" })
+vim.api.nvim\_set\_hl(0, "ResolveAncestorSection", { bg \= "#3a322a" })
+
+Or link to existing highlight groups if you prefer theme-matched colours:
+
+\-- Markers
+vim.api.nvim\_set\_hl(0, "ResolveOursMarker", { link \= "DiffAdd" })
+vim.api.nvim\_set\_hl(0, "ResolveTheirsMarker", { link \= "DiffChange" })
+vim.api.nvim\_set\_hl(0, "ResolveSeparatorMarker", { link \= "NonText" })
+vim.api.nvim\_set\_hl(0, "ResolveAncestorMarker", { link \= "DiffText" })
+
+\-- Sections
+vim.api.nvim\_set\_hl(0, "ResolveOursSection", { link \= "DiffAdd" })
+vim.api.nvim\_set\_hl(0, "ResolveTheirsSection", { link \= "DiffChange" })
+vim.api.nvim\_set\_hl(0, "ResolveAncestorSection", { link \= "DiffText" })
+
+To disable section highlights entirely while keeping marker highlights:
+
+vim.api.nvim\_set\_hl(0, "ResolveOursSection", {})
+vim.api.nvim\_set\_hl(0, "ResolveTheirsSection", {})
+vim.api.nvim\_set\_hl(0, "ResolveAncestorSection", {})
+
+## Usage
+
+[](#usage)
+
+### Default Keymaps
+
+[](#default-keymaps)
+
+When `default_keymaps` is enabled (keymaps are buffer-local, only active when conflicts exist):
+
+-   `]x` - Navigate to next conflict
+-   `[x` - Navigate to previous conflict
+-   `<leader>gco` - Choose ours (current changes)
+-   `<leader>gct` - Choose theirs (incoming changes)
+-   `<leader>gcb` - Choose both (keep both versions)
+-   `<leader>gcB` - Choose both reverse (theirs then ours)
+-   `<leader>gcm` - Choose base/ancestor (diff3 only)
+-   `<leader>gcn` - Choose none (delete conflict)
+-   `<leader>gcl` - List all conflicts in quickfix window
+-   `<leader>gcdo` - Show diff ours (base → ours, diff3 only)
+-   `<leader>gcdt` - Show diff theirs (base → theirs, diff3 only)
+-   `<leader>gcdb` - Show diff both (base → ours and base → theirs, diff3 only)
+-   `<leader>gcdv` - Show diff ours → theirs (direct comparison, works without diff3)
+-   `<leader>gcdV` - Show diff theirs → ours (reverse comparison, works without diff3)
+
+The `<leader>gc` prefix displays as "Git Conflicts" in which-key, and `<leader>gcd` displays as "Diff".
+
+### Commands
+
+[](#commands)
+
+The plugin provides the following commands:
+
+-   `:ResolveNext` - Navigate to next conflict
+-   `:ResolvePrev` - Navigate to previous conflict
+-   `:ResolveOurs` - Choose ours version
+-   `:ResolveTheirs` - Choose theirs version
+-   `:ResolveBoth` - Choose both versions (ours then theirs)
+-   `:ResolveBothReverse` - Choose both versions (theirs then ours)
+-   `:ResolveBase` - Choose base/ancestor version (diff3 only)
+-   `:ResolveNone` - Choose neither version
+-   `:ResolveList` - List all conflicts in quickfix
+-   `:ResolveDetect` - Manually detect conflicts
+-   `:ResolveDiffOurs` - Show diff of our changes from base (diff3 only)
+-   `:ResolveDiffTheirs` - Show diff of their changes from base (diff3 only)
+-   `:ResolveDiffBoth` - Show both diffs in floating window (diff3 only)
+-   `:ResolveDiffOursTheirs` - Show diff ours → theirs (works without diff3)
+-   `:ResolveDiffTheirsOurs` - Show diff theirs → ours (works without diff3)
+
+### Custom Keymaps
+
+[](#custom-keymaps)
+
+If you prefer custom keymaps, disable the default ones and set your own using the `<Plug>` mappings:
+
+require("resolve").setup({
+  default\_keymaps \= false,
+})
+
+\-- Example: Set custom keymaps using <Plug> mappings
+\-- Register groups for which-key (optional)
+vim.keymap.set("n", "<leader>gc", "", { desc \= "+Git Conflicts" })
+vim.keymap.set("n", "<leader>gcd", "", { desc \= "+Diff" })
+
+vim.keymap.set("n", "\]c", "<Plug>(resolve-next)", { desc \= "Next conflict" })
+vim.keymap.set("n", "\[c", "<Plug>(resolve-prev)", { desc \= "Previous conflict" })
+vim.keymap.set("n", "<leader>gco", "<Plug>(resolve-ours)", { desc \= "Choose ours" })
+vim.keymap.set("n", "<leader>gct", "<Plug>(resolve-theirs)", { desc \= "Choose theirs" })
+vim.keymap.set("n", "<leader>gcb", "<Plug>(resolve-both)", { desc \= "Choose both" })
+vim.keymap.set("n", "<leader>gcB", "<Plug>(resolve-both-reverse)", { desc \= "Choose both reverse" })
+vim.keymap.set("n", "<leader>gcm", "<Plug>(resolve-base)", { desc \= "Choose base" })
+vim.keymap.set("n", "<leader>gcn", "<Plug>(resolve-none)", { desc \= "Choose none" })
+vim.keymap.set("n", "<leader>gcdo", "<Plug>(resolve-diff-ours)", { desc \= "Diff ours" })
+vim.keymap.set("n", "<leader>gcdt", "<Plug>(resolve-diff-theirs)", { desc \= "Diff theirs" })
+vim.keymap.set("n", "<leader>gcdb", "<Plug>(resolve-diff-both)", { desc \= "Diff both" })
+vim.keymap.set("n", "<leader>gcdv", "<Plug>(resolve-diff-vs)", { desc \= "Diff ours → theirs" })
+vim.keymap.set("n", "<leader>gcdV", "<Plug>(resolve-diff-vs-reverse)", { desc \= "Diff theirs → ours" })
+vim.keymap.set("n", "<leader>gcl", "<Plug>(resolve-list)", { desc \= "List conflicts" })
+
+### Available `<Plug>` Mappings
+
+[](#available-plug-mappings)
+
+The following `<Plug>` mappings are always available for custom keybindings:
+
+-   `<Plug>(resolve-next)` - Navigate to next conflict
+-   `<Plug>(resolve-prev)` - Navigate to previous conflict
+-   `<Plug>(resolve-ours)` - Choose ours version
+-   `<Plug>(resolve-theirs)` - Choose theirs version
+-   `<Plug>(resolve-both)` - Choose both versions (ours then theirs)
+-   `<Plug>(resolve-both-reverse)` - Choose both versions (theirs then ours)
+-   `<Plug>(resolve-base)` - Choose base version
+-   `<Plug>(resolve-none)` - Choose neither version
+-   `<Plug>(resolve-diff-ours)` - Show diff ours (base → ours)
+-   `<Plug>(resolve-diff-theirs)` - Show diff theirs (base → theirs)
+-   `<Plug>(resolve-diff-both)` - Show both diffs
+-   `<Plug>(resolve-diff-vs)` - Show diff ours → theirs
+-   `<Plug>(resolve-diff-vs-reverse)` - Show diff theirs → ours
+-   `<Plug>(resolve-list)` - List conflicts in quickfix
+
+**Note:** The default keymaps use `<leader>gc` prefix (git conflicts) to avoid conflicts with LSP-specific keybindings that may be dynamically set under `<leader>c` when language servers attach.
+
+### Buffer-Local Keymaps
+
+[](#buffer-local-keymaps)
+
+When `default_keymaps` is enabled, keymaps are only set in buffers that contain conflicts. This prevents the keymaps from interfering with other plugins or workflows in files without conflicts.
+
+The plugin automatically registers the `<leader>gc` group with which-key (if installed), displaying "Git Conflicts" when you press `<leader>g` in a buffer with conflicts.
+
+### Matchit Integration
+
+[](#matchit-integration)
+
+The plugin integrates with Vim's matchit to allow jumping between conflict markers using `%`. When a buffer contains conflicts, you can press `%` on any marker (`<<<<<<<`, `|||||||`, `=======`, `>>>>>>>`) to jump to the corresponding marker in the conflict.
+
+### Viewing Diffs
+
+[](#viewing-diffs)
+
+You can view diffs to help understand what changed on each side of the conflict.
+
+**Diff3-style conflicts** (with base/ancestor):
+
+-   `<leader>gcdo` (or `:ResolveDiffOurs`) - Show base → ours (what you changed)
+-   `<leader>gcdt` (or `:ResolveDiffTheirs`) - Show base → theirs (what they changed)
+-   `<leader>gcdb` (or `:ResolveDiffBoth`) - Show both diffs in one window
+
+**All conflicts** (including non-diff3):
+
+-   `<leader>gcdv` (or `:ResolveDiffOursTheirs`) - Show ours → theirs (what changes if you accept theirs)
+-   `<leader>gcdV` (or `:ResolveDiffTheirsOurs`) - Show theirs → ours (what changes if you accept ours)
+
+The direct comparison views are useful when you want to see the actual differences between the two sides without comparing to the base. They work even when there's no ancestor section. The arrow indicates the diff direction: additions appear as lines being added to the left side to produce the right side.
+
+The diff view uses [delta](https://github.com/dandavison/delta) for beautiful syntax highlighting with intra-line change emphasis. Press `q` or `<Esc>` to close the floating window.
+
+### Hooks and Callbacks
+
+[](#hooks-and-callbacks)
+
+You can run custom code when conflicts are detected or resolved using callbacks:
+
+require("resolve").setup({
+  on\_conflict\_detected \= function(info)
+    \-- Called when conflicts are found in a buffer
+    \-- info.bufnr: buffer number
+    \-- info.conflicts: table of conflict data
+    vim.notify(string.format("Found %d conflicts!", #info.conflicts), vim.log.levels.WARN)
+
+    \-- Example: Auto-open quickfix list when conflicts detected
+    vim.schedule(function()
+      require("resolve").list\_conflicts()
+    end)
+  end,
+
+  on\_conflicts\_resolved \= function(info)
+    \-- Called when all conflicts in a buffer are resolved
+    \-- info.bufnr: buffer number
+    vim.notify("All conflicts resolved!", vim.log.levels.INFO)
+
+    \-- Example: Remove custom keymaps you added in on\_conflict\_detected
+    vim.keymap.del("n", "<leader>cc", { buffer \= info.bufnr })
+  end,
+})
+
+The `on_conflicts_resolved` hook is particularly useful for cleaning up custom keymaps or other buffer-local setup you added in `on_conflict_detected`.
+
+## How It Works
+
+[](#how-it-works)
+
+When you open a file with merge conflicts, resolve.nvim automatically:
+
+1.  Detects conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+2.  Highlights the conflicting regions
+3.  Provides commands to navigate and resolve conflicts
+
+### Conflict Structure
+
+[](#conflict-structure)
+
+Standard 3-way merge:
+
+```
+<<<<<<< HEAD (ours)
+Your changes
+=======
+Their changes
+>>>>>>> branch-name (theirs)
+```
+
+diff3 style:
+
+```
+<<<<<<< HEAD (ours)
+Your changes
+||||||| ancestor
+Original content
+=======
+Their changes
+>>>>>>> branch-name (theirs)
+```
+
+## License
+
+[](#license)
+
+MIT
+
+## About
+
+A Neovim plugin for resolving merge conflicts with conflict marker highlighting and resolution commands.
+
+### Resources
+
+[Readme](#readme-ov-file)
+
+### License
+
+[MIT license](#MIT-1-ov-file)
+
+### Uh oh!
+
+There was an error while loading. Please reload this page.
+
+[Activity](/spacedentist/resolve.nvim/activity)
+
+### Stars
+
+[**49** stars](/spacedentist/resolve.nvim/stargazers)
+
+### Watchers
+
+[**0** watching](/spacedentist/resolve.nvim/watchers)
+
+### Forks
+
+[**3** forks](/spacedentist/resolve.nvim/forks)
+
+[Report repository](/contact/report-content?content_url=https%3A%2F%2Fgithub.com%2Fspacedentist%2Fresolve.nvim&report=spacedentist+%28user%29)
+
+## [Releases](/spacedentist/resolve.nvim/releases)
+
+No releases published
+
+## [Packages 0](/users/spacedentist/packages?repo_name=resolve.nvim)
+
+### Uh oh!
+
+There was an error while loading. Please reload this page.
+
+## [Contributors](/spacedentist/resolve.nvim/graphs/contributors)
+
+### Uh oh!
+
+There was an error while loading. Please reload this page.
+
+## Languages
+
+-   [Lua 100.0%](/spacedentist/resolve.nvim/search?l=lua)
+
+## Footer
+
+[](https://github.com)© 2026 GitHub, Inc.
+
+### Footer navigation
+
+-   [Terms](https://docs.github.com/site-policy/github-terms/github-terms-of-service)
+-   [Privacy](https://docs.github.com/site-policy/privacy-policies/github-privacy-statement)
+-   [Security](https://github.com/security)
+-   [Status](https://www.githubstatus.com/)
+-   [Community](https://github.community/)
+-   [Docs](https://docs.github.com/)
+-   [Contact](https://support.github.com?tags=dotcom-footer)
+-   Manage cookies
+-   Do not share my personal information
+
+You can’t perform that action at this time.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 22.1s)
+
+resolve.nvim already has a well-thought-out scheme:
+
+- `<leader>gc` prefix ("git conflicts")
+- `<leader>gcd` sub-prefix for diffs
+- `]x`/`[x` for conflict navigation
+- `:ResolveList` populates quickfix
+- Buffer-local keymaps — only active when conflicts exist
+- Has `<Plug>` mappings if you want custom binds
+- Matchit integration — `%` jumps between conflict markers
+- Requires `delta` for diff views (you probably have this)
+
+Their defaults are actually close to your `<leader>gx` idea — they use `<leader>gc` (git conflicts) instead of `<leader>gx`. The `]x`/`[x` for navigation fits your bracket motion conventions too (though the letter `x` is a bit arbitrary — but it's their default).
+
+One thing: `]x` conflicts with your navigation conventions where `]X` would mean "last conflict." Their plugin doesn't have first/last.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "### 24–26. Git merge conflicts\nPart of: **git**. Touches: **navigation conventions**.\n\nresolve.nvim (decided). Handles highlighting, resolution, and diffing.\n\n**Requirements:**\n- Semantic highlighting for conflict markers and content sections (ours/theirs/ancestor with colored backgrounds)\n- 3-way diff support (diff3 format with ancestor/base)\n- Navigate between conflicts: `]x`/`[x` (resolve.nvim default). Consider adding `]X`/`[X` for first/last per navigation conventions.\n- Resolution keybinds: `<leader>gc` prefix (resolve.nvim default: `<leader>gco` ours, `<leader>gct` theirs, `<leader>gcb` both, `<leader>gcm` base, `<leader>gcn` none)\n- Diff views: `<leader>gcd` prefix (base→ours, base→theirs, both, direct ours→theirs). Uses `delta` for rendering.\n- `:ResolveList` populates quickfix with all conflicts — already built-in\n- Also want: `git jump merge` → quickfix as a command for loading conflicts across all files before opening them. Maybe `:GitJumpMerge` command.\n- Buffer-local keymaps — only active when conflicts exist (resolve.nvim does this)\n- Matchit `%` integration — jump between markers (resolve.nvim does this)\n- Callbacks: maybe auto-open quickfix on conflict detection\n- Disable default keymaps and use `<Plug>` mappings if we want to customize the scheme\n- Open question: `<leader>gc` vs `<leader>gx` — resolve.nvim defaults to `<leader>gc`. Works with which-key. Probably just use their defaults.\n- Requires `delta` — needs to be available in nix-wrapped nvim\n\n**Possible plugins:** `resolve.nvim` (decided)",
+  "oldString": "**Possible plugins:** `which-key.nvim`\n\n### 23. Buffer close"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 4.4s)
+
+Wait, I clobbered #23 again. Let me fix.
+
+**Tool: read**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "offset": 393
+}
+```
+
+**Output:**
+```
+<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
+<type>file</type>
+<content>393: 
+394: ### 24–26. Git merge conflicts
+395: Part of: **git**. Touches: **navigation conventions**.
+396: 
+397: resolve.nvim (decided). Handles highlighting, resolution, and diffing.
+398: 
+399: **Requirements:**
+400: - Semantic highlighting for conflict markers and content sections (ours/theirs/ancestor with colored backgrounds)
+401: - 3-way diff support (diff3 format with ancestor/base)
+402: - Navigate between conflicts: `]x`/`[x` (resolve.nvim default). Consider adding `]X`/`[X` for first/last per navigation conventions.
+403: - Resolution keybinds: `<leader>gc` prefix (resolve.nvim default: `<leader>gco` ours, `<leader>gct` theirs, `<leader>gcb` both, `<leader>gcm` base, `<leader>gcn` none)
+404: - Diff views: `<leader>gcd` prefix (base→ours, base→theirs, both, direct ours→theirs). Uses `delta` for rendering.
+405: - `:ResolveList` populates quickfix with all conflicts — already built-in
+406: - Also want: `git jump merge` → quickfix as a command for loading conflicts across all files before opening them. Maybe `:GitJumpMerge` command.
+407: - Buffer-local keymaps — only active when conflicts exist (resolve.nvim does this)
+408: - Matchit `%` integration — jump between markers (resolve.nvim does this)
+409: - Callbacks: maybe auto-open quickfix on conflict detection
+410: - Disable default keymaps and use `<Plug>` mappings if we want to customize the scheme
+411: - Open question: `<leader>gc` vs `<leader>gx` — resolve.nvim defaults to `<leader>gc`. Works with which-key. Probably just use their defaults.
+412: - Requires `delta` — needs to be available in nix-wrapped nvim
+413: 
+414: **Possible plugins:** `resolve.nvim` (decided)
+415: 
+416: **Requirements:**
+417: - `<leader>x` to close current buffer
+418: - Preserve window layout — don't close the window, replace the buffer
+419: - Show previous buffer in that window, but avoid showing a buffer that's already visible in another window (the "same buffer in two splits" problem)
+420: - Should work for quick successive closes (the "xxxx cleanup" workflow)
+421: 
+422: **Possible plugins:** `bufdel.nvim`, `mini.bufremove`, hand-rolled
+423: 
+424: ---
+425: 
+426: ## Implementation Approach
+427: 
+428: For each feature:
+429: 1. Create/edit the config file
+430: 2. `vim.pack.add()` if needed
+431: 3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.
+432: 4. Test in real editing
+433: 5. `nix flake check`
+434: 
+435: One feature at a time. Live with it. Adjust. Next.
+436: 
+437: ## Verification
+438: 
+439: - `nix flake check` passes after each change
+
+(End of file - total 439 lines)
+</content>
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 5.1s)
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "**Possible plugins:** `resolve.nvim` (decided)\n\n### 23. Buffer close\n\n**Requirements:**\n- `<leader>x` to close current buffer\n- Preserve window layout — don't close the window, replace the buffer\n- Show previous buffer in that window, but avoid showing a buffer that's already visible in another window (the \"same buffer in two splits\" problem)\n- Should work for quick successive closes (the \"xxxx cleanup\" workflow)\n\n**Possible plugins:** `bufdel.nvim`, `mini.bufremove`, hand-rolled",
+  "oldString": "**Possible plugins:** `resolve.nvim` (decided)\n\n**Requirements:**\n- `<leader>x` to close current buffer\n- Preserve window layout — don't close the window, replace the buffer\n- Show previous buffer in that window, but avoid showing a buffer that's already visible in another window (the \"same buffer in two splits\" problem)\n- Should work for quick successive closes (the \"xxxx cleanup\" workflow)\n\n**Possible plugins:** `bufdel.nvim`, `mini.bufremove`, hand-rolled"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 5.1s)
+
+OK, #23 is back. **#27 — Zsh edit-command-line highlighting** is the last must-have. You already investigated: zsh ft has weak highlighting, bash ft works but isn't fully correct. Anything to add beyond "make it work"?
+
+---
+
+## User
+
+yeah i don't want to use the conflict list stuff from that plugin. that's buffer local.
+we can register our own keybinds when it detects conflicts in the current buffer, and clean them up when done too.
+similar to how we register LSP keymaps on attatch.
+
+<leader>gc as prefix is nice yeah.
+the X stuff isn't needed, I'll just always use the quickfix list.
+no need for endless ] style mappings for super contextual stuff. just load up the qflist and be done.
+i like your explicit GitConflictsToQuickfix style better. more explicit. not used super often so fine.
+
+the idea is not to use everything from the plugin, but to use the plugin to implement the exact flow for me.
+that's the idea of nvim: make the config fit ME perfectly.
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 13.0s)
+
+
+
+Exactly. Use the plugin's primitives (highlighting, `<Plug>` mappings, callbacks), build your own workflow on top.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "**Requirements:**\n- Semantic highlighting for conflict markers and content sections (ours/theirs/ancestor with colored backgrounds)\n- 3-way diff support (diff3 format with ancestor/base)\n- Navigate between conflicts via quickfix — not `]x`/`[x`. Load conflicts into quickfix and use normal quickfix navigation.\n- `:GitConflictsToQuickfix` command (or similar) — loads all conflicts across all files. Use `git jump merge` under the hood or resolve.nvim's list function.\n- Resolution keybinds: `<leader>gc` prefix. Register buffer-local keymaps when conflicts detected, clean up when resolved (like LSP keymaps on attach). Use resolve.nvim's `<Plug>` mappings + callbacks.\n  - `<leader>gco` ours, `<leader>gct` theirs, `<leader>gcb` both, `<leader>gcm` base, `<leader>gcn` none\n- Diff views: `<leader>gcd` prefix (base→ours, base→theirs, both, ours→theirs). Uses `delta` for rendering.\n- Disable resolve.nvim's default keymaps — wire up our own using `<Plug>` mappings\n- Matchit `%` integration — jump between markers (resolve.nvim does this, keep it)\n- Requires `delta` — needs to be available in nix-wrapped nvim",
+  "oldString": "**Requirements:**\n- Semantic highlighting for conflict markers and content sections (ours/theirs/ancestor with colored backgrounds)\n- 3-way diff support (diff3 format with ancestor/base)\n- Navigate between conflicts: `]x`/`[x` (resolve.nvim default). Consider adding `]X`/`[X` for first/last per navigation conventions.\n- Resolution keybinds: `<leader>gc` prefix (resolve.nvim default: `<leader>gco` ours, `<leader>gct` theirs, `<leader>gcb` both, `<leader>gcm` base, `<leader>gcn` none)\n- Diff views: `<leader>gcd` prefix (base→ours, base→theirs, both, direct ours→theirs). Uses `delta` for rendering.\n- `:ResolveList` populates quickfix with all conflicts — already built-in\n- Also want: `git jump merge` → quickfix as a command for loading conflicts across all files before opening them. Maybe `:GitJumpMerge` command.\n- Buffer-local keymaps — only active when conflicts exist (resolve.nvim does this)\n- Matchit `%` integration — jump between markers (resolve.nvim does this)\n- Callbacks: maybe auto-open quickfix on conflict detection\n- Disable default keymaps and use `<Plug>` mappings if we want to customize the scheme\n- Open question: `<leader>gc` vs `<leader>gx` — resolve.nvim defaults to `<leader>gc`. Works with which-key. Probably just use their defaults.\n- Requires `delta` — needs to be available in nix-wrapped nvim"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Plan · eu.anthropic.claude-opus-4-6-v1 · 4.1s)
+
+**#27 — Zsh edit-command-line highlighting.** You found zsh ft has weak syntax highlighting, bash works better but isn't fully correct. Probably just set the filetype to bash for the temp buffer and call it good enough?
 
 ---
 
