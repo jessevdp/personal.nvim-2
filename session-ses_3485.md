@@ -2,35 +2,7 @@
 
 **Session ID:** ses_3485f73fdffeMz2pjdmdugjkDr
 **Created:** 3/4/2026, 7:54:38 AM
-**Updated:** 3/5/2026, 7:39:49 AM
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 7.0s)
-
-Right — `gqB` already formats the whole buffer via LSP. The `B` textobject would make this work naturally: `gq` is the format operator, `B` is the "whole buffer" textobject, so `gqB` = "format whole buffer" would just work™ without needing that special mapping. The special mapping could go away.
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "- `B` — whole buffer. Note: `gqB` already exists as a special mapping for LSP format-whole-buffer. With a proper `B` textobject, `gqB` would work naturally via the `gq` operator and the special mapping can be removed.",
-  "oldString": "- `B` — whole buffer"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 2.8s)
-
-On to **#8 — Swap / reorder**?
+**Updated:** 3/5/2026, 7:51:06 AM
 
 ---
 
@@ -2085,6 +2057,48 @@ Edit applied successfully.
 ## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 2.9s)
 
 **#22 — Key hints?**
+
+---
+
+## User
+
+yeah it wouldn't be the LSP name I think.
+maybe just the language icon for what's active and connected to the buffer?
+it would have to be really subtle.
+not sure if helpful... what do things like vscode do regarding LSP in their UI?
+
+the "filetype" i'm wondering if i should have still.
+there's a handful of times when it might be useful.
+
+also important: if a component is "empty" e.g. no diagnostics or git status stuff.
+it just doesn't show.
+no clutter.
+
+if we ever get around to AI -> it needs a "working" indicator.
+could be in the statusline.
+could also be fidget like thing that contextually pops up.
+who knows. probably belongs in the AI section not the statusline.
+same with the cmdheight 0 stuff -> those are requirements for that section. Let's not think about them here.
+does reference "statusline" as our shared space...
+
+there's an oil specific thing I want to do for the statusline
+some buffers/filetypes need way LESS in their statusline.
+for oil its just the mode + the current path.
+might be nice if we can shorten that current path. by default oil does something like oil:///Full/path/to/current/dir
+we can shorten that.
+if under home: cut it off at ~
+else show the full path but without the oil:// stuff?
+maybe even make it relative to the CWD?
+although we have the dropbar for that too already.
+for Oil i currently use 0 parts on the right side of the statusline.
+
+the quickfix list can probably also use a different type of statusline. maybe just the title + amount of entries?
+any other filetypes that benefit from a cleaner / more specific statusline?
+maybe undotree? (i use the nvim built in one now)
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1)
 
 ---
 
