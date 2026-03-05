@@ -5,8 +5,9 @@ vim.pack.add({
 require("gruvbox").setup({
   extend_background_behind_borders = true,
   highlight_groups = {
-    LspReferenceRead = { bg = "bg2" },
-    OilGitUntracked = { fg = "gray" },
+    -- TODO: upstream to gruvbox.nvim
+    LspReferenceText = { link = "LspReferenceRead" },
+    LspReferenceWrite = { link = "LspReferenceRead" },
   },
 })
 
