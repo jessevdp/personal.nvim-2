@@ -2,237 +2,7 @@
 
 **Session ID:** ses_3485f73fdffeMz2pjdmdugjkDr
 **Created:** 3/4/2026, 7:54:38 AM
-**Updated:** 3/5/2026, 7:25:47 AM
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 32.4s)
-
-
-
-Good points. Let me respond to each:
-
-**1. Fallback** — depends on approach. `mini.ai` can chain specs: try treesitter first, fall back to pattern-based. `nvim-treesitter-textobjects` just silently does nothing if the query doesn't exist. So the framework choice matters here. Worth noting as a requirement: "degrade gracefully when treesitter queries aren't available."
-
-**4. `b` vs `o`** — `b` is built-in for `()` parentheses (`ib` = inside parens). So `o` for blocks makes sense. Using `o` for both ruby blocks and markdown code fences is conceptually clean — they're both "blocks." For the backtick question: built-in `` i` ``/`` a` `` already selects text between backticks (which IS inline code in markdown). With treesitter, the nodes are different (`code_span` vs `fenced_code_block`), so `o` could target the fenced block specifically while `` ` `` handles inline code naturally. No clash.
-
-**5. `A` for all arguments** — clean. Mirrors `w`/`W`. `ia` = inner single argument, `aA` = around all arguments including parens.
-
-**6. Comments** — `gc` is an operator, not a textobject. There's no built-in "select this comment block" textobject. Treesitter has `@comment.outer` which could power one. For indentation-based: "select all contiguous lines at this indent level" is useful in YAML, Python, and generally for "this indented block." Common keys are `ii`/`ai`.
-
-So the updated textobject list would be:
-
-- `aF`/`iF` — function definition (`aM`/`iM` alias)
-- `af`/`if` — function call (`am`/`im` alias)
-- `ac`/`ic` — class/module
-- `ao`/`io` — block (ruby do..end/`{}`, markdown code fences)
-- `ia`/`aa` — single argument
-- `iA`/`aA` — all arguments (including parens for `aA`)
-- `B` — whole buffer
-- `q` — any quotes (ties into surround)
-- `ih` — git hunk (from git signs)
-- Maybe: comment block (treesitter `@comment.outer`)
-- Maybe: indentation level (`ii`/`ai`)
-
-Does that look right? Anything to add/cut before I write it up?
-
----
-
-## User
-
-what happens when I have ruby blocks inside a markdown code block? 🤡
-that's a question for later.
-for markdown, let's do `o` for blocks.
-can we also make ` do fenced_code_block AND code_span? or is it either/or?
-it would select the closes (1st surrounding) one right?
-or if not inside one or the other: the next one on the current line?
-we always have `o` if we know we want fenced code block.
-but ` is a "least surprise" type thing.
-
-lets add the indentation one too.
-what happens in this situation?
-
-```ruby
-def foo
-  f = "f"
-  o = "o"
-  
-  f + o + o
-end
-```
-
-would it select the f, o, and f + o + o lines? since they're all at the indentation level? including the white line? that's most logical I think.
-
-comment block.. there's gcgc which uncomments this commented thing.
-but I think its single line usually.
-i don't think @comment.outer works particularly well in ruby
-what would the letter even be? K for Komment?
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 34.2s)
-
-**Backtick for both** — yes, this should work with treesitter. It would target the nearest enclosing one (code_span or fenced_code_block), and if not inside either, the next one. `mini.ai` supports this "covering or next" search. So `` ` `` is "whatever backtick thing I'm in or near" and `o` is "I specifically want the fenced code block." Clean.
-
-**Indentation** — yes, in your example with cursor on `f = "f"`:
-- `ii` would select `f = "f"`, `o = "o"`, the blank line, and `f + o + o` (all lines at same indent, including blank lines in between)
-- `ai` would typically also grab the surrounding container lines (`def foo` and `end`)
-
-Blank line inclusion varies by implementation — we'd want it included as you said.
-
-**Comment block** — honestly `@comment.outer` in Ruby just gets one `#` line since each is a separate node. For contiguous comment blocks you'd need pattern matching ("all adjacent lines starting with `#`"). And the key: `c` is class, `C` in normal mode is "change to end of line" but `iC`/`aC` in textobject context is fine... except it's visually close to `ic` (class). `/` or `#` could work but aren't language-agnostic. Probably not worth the bikeshed right now.
-
-Let me write up the requirements and leave comment block as a maybe.
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "offset": 165
-}
-```
-
-**Output:**
-```
-<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
-<type>file</type>
-<content>165: 
-166: **Requirements:**
-167: - `<leader><leader>` and `<leader>sf` for file search
-168: - `<leader>sg` for live grep
-169: - Default ranking/frecency — just use fff.nvim defaults
-170: - Resume last search (`<leader>s.` or similar) — **investigate:** does fff.nvim support this?
-171: - Send results to quickfix (new qflist). Nice to have: append to current qflist via separate keybind. — **investigate:** fff.nvim recently added qflist support (#216), verify new vs append behavior
-172: - Just files & grep for now. Other pickers (help, symbols, buffers) can come later or from another tool.
-173: - Nix: fff.nvim has a rust binary. Must work in nix-wrapped nvim (prebuilt download or cargo build).
-174: 
-175: **Possible plugins:** `fff.nvim` (decided)
-176: 
-177: ### 2–6. Git signs, blame, hunks
-178: Part of: **git**, **toggleable UI** (blame). Touches: **sign column**, **navigation conventions**, **inlay hints/virtual text** (blame).
-179: 
-180: **Requirements:**
-181: - Thin bar signs in sign column for added/changed/deleted (see: sign column)
-182: - Staged vs unstaged changes should look visually different
-183: - Inline blame, toggleable (see: toggleable UI)
-184: - Navigate hunks: `]h` next, `[h` prev, `]H` last, `[H` first (see: navigation conventions)
-185: - Hunk actions: stage, reset, preview
-186: - `ih` textobject for selecting current hunk
-187: - Open question: `]h` skips staged hunks (semantically correct but confusing mid-review). Maybe "navigate all hunks" vs "navigate unstaged hunks"?
-188: 
-189: **Possible plugins:** `gitsigns.nvim`
-190: 
-191: ---
-192: 
-193: ## Implementation Approach
-194: 
-195: For each feature:
-196: 1. Create/edit the config file
-197: 2. `vim.pack.add()` if needed
-198: 3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.
-199: 4. Test in real editing
-200: 5. `nix flake check`
-201: 
-202: One feature at a time. Live with it. Adjust. Next.
-203: 
-204: ## Verification
-205: 
-206: - `nix flake check` passes after each change
-
-(End of file - total 206 lines)
-</content>
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 14.0s)
-
-**Tool: edit**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
-  "newString": "**Possible plugins:** `gitsigns.nvim`\n\n### 7. Textobjects\nRelates to: **text operations** (`q` ties into surround).\n\n**Requirements:**\n- `aF`/`iF` — function definition (`aM`/`iM` alias for method) (treesitter)\n- `af`/`if` — function call (`am`/`im` alias) (treesitter)\n- `ac`/`ic` — class/module (treesitter)\n- `ao`/`io` — block: ruby do..end/`{}`, markdown fenced code block (treesitter)\n- `` a` ``/`` i` `` — backtick-delimited: matches nearest code_span OR fenced_code_block (treesitter). Use `o` when you specifically want fenced block.\n- `ia`/`aa` — single argument (treesitter)\n- `iA`/`aA` — all arguments including parens for `aA` (treesitter)\n- `B` — whole buffer\n- `q` — any quotes (nearest surrounding quote pair). Must also work in surround (`csq\"` = change surrounding any-quotes to double-quotes).\n- `ii`/`ai` — indentation level. `ii` = all contiguous lines at same indent (including blank lines between them). `ai` = same + container lines above/below.\n- `ih` — git hunk (comes from git signs, not this feature)\n- Degrade gracefully: if treesitter query isn't available for a language, don't error. Fall back or silently do nothing.\n- Best-effort per language for function def vs call distinction.\n- Maybe: comment block textobject (contiguous comment lines). Key TBD. `@comment.outer` doesn't work well for multi-line `#` comments in Ruby — would need pattern-based approach.\n\n**Possible plugins:** `nvim-treesitter-textobjects`, `mini.ai`, `nvim-various-textobjs` (can mix)",
-  "oldString": "**Possible plugins:** `gitsigns.nvim`"
-}
-```
-
-**Output:**
-```
-Edit applied successfully.
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 4.6s)
-
-Done. Next up: **#8 — Swap / reorder** or **#9 — Surround**? They're related through text operations. Want to do them together or one at a time?
-
----
-
-## User
-
-for whole buffer -> reference that I've already done a thing for "format whole buffer" for LSP based formatting.
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 4.0s)
-
-
-
-Good call. Let me check what you have.
-
-**Tool: grep**
-
-**Input:**
-```json
-{
-  "pattern": "gqB|whole buffer|format.*buffer",
-  "include": "*.lua"
-}
-```
-
-**Output:**
-```
-Found 1 matches
-/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/lua/config/lsp.lua:
-  Line 18:     vim.keymap.set("n", "gqB", function()
-```
-
----
-
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 3.1s)
-
-**Tool: read**
-
-**Input:**
-```json
-{
-  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/lua/config/lsp.lua",
-  "offset": 15,
-  "limit": 15
-}
-```
-
-**Output:**
-```
-<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/lua/config/lsp.lua</path>
-<type>file</type>
-<content>15: 
-16: vim.api.nvim_create_autocmd("LspAttach", {
-17:   callback = function()
-18:     vim.keymap.set("n", "gqB", function()
-19:       vim.lsp.buf.format({ async = false })
-20:     end)
-21:   end,
-22: })
-
-(End of file - total 22 lines)
-</content>
-```
+**Updated:** 3/5/2026, 7:39:49 AM
 
 ---
 
@@ -2117,14 +1887,204 @@ you deleted some text for #19 i think
 
 ---
 
-## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1)
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 5.6s)
 
 **Tool: read**
 
 **Input:**
 ```json
-{}
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "offset": 330
+}
 ```
+
+**Output:**
+```
+<path>/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md</path>
+<type>file</type>
+<content>330: - `s` + two chars to jump anywhere visible — any window, bidirectional
+331: - Core use case: "I'm looking somewhere, I press `s??`, I'm there." No thinking about current cursor position.
+332: - Works in normal mode (overrides stock `s` which is `cl` — fine, never used)
+333: - Also in operator-pending and visual mode for least surprise — not the primary use case but should just work
+334: - Start simple with 2-char motions. Remote actions and treesitter selection are explore/later (see #39).
+335: 
+336: ### 19. Motion repeat
+337: See: **navigation conventions**.
+338: 
+339: **Requirements:**
+340: - `;` repeats last bracket motion forward, `,` repeats backward
+341: - Covers all `]`/`[` motions: hunks, diagnostics, quickfix, treesitter moves, etc.
+342: - Must preserve stock `f`/`t`/`F`/`T` repeatability (`;`/`,` already do this in stock vim — plugin must not break it)
+343: - Not for leap/flash — bidirectional jump has no direction to repeat
+344: 
+345: ### 20. Diagnostics
+346: Touches: **sign column**, **toggleable UI**, **navigation conventions**.
+347: 
+348: **Requirements:**
+349: - Clean up sign column icons (nicer than default text)
+350: - `]d`/`[d` next/prev diagnostic, `]D`/`[D` last/first (navigation conventions)
+351: - Virtual text: off by default, toggleable (see: toggleable UI). Maybe: show only for current line, or on cursor hold.
+352: - `<C-w>d` for float already works — keep that
+353: - `:DiagnosticsToQuickfix` or similar — send diagnostics to quickfix list. Support current buffer and all buffers.
+354: - Severity filtering: don't bother for navigation. Filter via quickfix if needed.
+355: 
+356: **Possible plugins:** built-in `vim.diagnostic` config, `trouble.nvim`
+357: 
+358: ---
+359: 
+360: ## Implementation Approach
+361: 
+362: For each feature:
+363: 1. Create/edit the config file
+364: 2. `vim.pack.add()` if needed
+365: 3. Keybindings (stock-adjacent). Not everything is a keybind — commands are fine.
+366: 4. Test in real editing
+367: 5. `nix flake check`
+368: 
+369: One feature at a time. Live with it. Adjust. Next.
+370: 
+371: ## Verification
+372: 
+373: - `nix flake check` passes after each change
+
+(End of file - total 373 lines)
+</content>
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 6.1s)
+
+Yep — #18 lost its plugins line and #19 lost its plugins line. Let me fix both.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "- Start simple with 2-char motions. Remote actions and treesitter selection are explore/later (see #39).\n\n**Possible plugins:** `leap.nvim`, `flash.nvim`\n\n### 19. Motion repeat",
+  "oldString": "- Start simple with 2-char motions. Remote actions and treesitter selection are explore/later (see #39).\n\n### 19. Motion repeat"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 5.7s)
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "- Not for leap/flash — bidirectional jump has no direction to repeat\n\n**Possible plugins:** `demicolon.nvim`, `vim-remotions`\n\n### 20. Diagnostics",
+  "oldString": "- Not for leap/flash — bidirectional jump has no direction to repeat\n\n### 20. Diagnostics"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 3.2s)
+
+Fixed. **#21 — Statusline?**
+
+---
+
+## User
+
+yes
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 9.1s)
+
+
+
+You mentioned: git status (not necessarily branch), diagnostics, line/col, filetype, mode (shortened). Maybe search count and macro indicator if cmdheight 0 happens.
+
+- What info matters most? Left side vs right side?
+- Mode indicator: `N`/`I`/`V`/`VB`/`VL` kind of thing? Or just color-coded?
+- Git: what git info? Diff stats (+3 -1)? Branch? Status (clean/dirty)?
+- Do you want it to look minimal/clean or information-dense?
+- Custom mode display (treewalker etc.) ties into the custom modes cross-cutting concern.
+
+---
+
+## User
+
+git diff stats +/-/~ color coded
+mode indicator: yeah. color coded too to match the theme.
+diagnostic counts err/warn/info etc.
+current line/column info
+% of the file
+file type
+file name (of course) (with written/changed indicator) like normal
+i want it pretty clean.
+
+left
+1 mode
+2 git
+  diagnostics
+3 filename
+
+right
+3 filetype with icon
+2 % in file
+1 line:column
+
+this is what I currently have
+the 3 groups are colored differently. a group can contain multiple components separated by |
+
+maybe I'm open to doing it differently this time.
+i noticed stock nvim doesn't do a "filetype" component. instead puts diagnostics on the right.
+might be cool.
+maybe put LSP there too?
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 17.2s)
+
+
+
+Interesting — stock nvim's statusline puts mode + file on the left, diagnostics + position on the right. No filetype, no git. Minimal.
+
+Your current layout is already good. Moving diagnostics to the right alongside position could work — it groups "where am I" (line/col/%) with "what's wrong here" (errors/warnings). Left side becomes pure context: mode, git, filename.
+
+LSP on the right — what would it show? Just the server name(s)? Or status (running/loading)? You already have fidget.nvim for progress. Maybe just the attached server name is enough as a subtle indicator. Or skip it entirely since `:checkhealth lsp` is always there.
+
+**Tool: edit**
+
+**Input:**
+```json
+{
+  "filePath": "/Users/jessevanderpluijm/Code/personal/jessevdp/personal-nvim/.opencode/plans/1772607278082-happy-engine.md",
+  "newString": "**Possible plugins:** built-in `vim.diagnostic` config, `trouble.nvim`\n\n### 21. Statusline\nRelates to: **custom modes** (show active mode in statusline).\n\n**Requirements:**\n- Clean, minimal look. Color-coded groups.\n- Mode indicator: shortened (N/I/V/VB/VL), color-coded to match theme\n- Git: diff stats (+/-/~), color-coded\n- Filename with modified/unsaved indicator\n- Diagnostic counts (error/warn/info), color-coded\n- Line:column, % in file\n- Filetype with icon\n- Maybe: LSP server name (subtle). Already have fidget for progress. Skip if too noisy.\n- Maybe: search count + macro recording indicator (needed if cmdheight 0, see #38)\n- Custom mode display: when in a submode (treewalker etc.), show it. Ties into custom modes concern.\n- Layout TBD — currently: left (mode | git | diagnostics | filename), right (filetype | % | line:col). Open to rearranging, e.g. diagnostics on the right with position info.\n\n**Possible plugins:** `mini.statusline`, `lualine.nvim`, hand-rolled",
+  "oldString": "**Possible plugins:** built-in `vim.diagnostic` config, `trouble.nvim`"
+}
+```
+
+**Output:**
+```
+Edit applied successfully.
+```
+
+---
+
+## Assistant (Shape · eu.anthropic.claude-opus-4-6-v1 · 2.9s)
+
+**#22 — Key hints?**
 
 ---
 
