@@ -4,13 +4,13 @@
       "rev": "ce202248134e3949aac375fd66c28e5207785b10",
       "src": "https://github.com/Bekaboo/dropbar.nvim"
     },
+    "fff.nvim": {
+      "rev": "10a27f96784d81fa4d7fdddc18efe501c3968cbf",
+      "src": "https://github.com/dmtrKovalenko/fff.nvim"
+    },
     "fidget.nvim": {
       "rev": "7fa433a83118a70fe24c1ce88d5f0bd3453c0970",
       "src": "https://github.com/j-hui/fidget.nvim"
-    },
-    "fzf-lua": {
-      "rev": "1eba927866251bae1b61dffc5b673b8dbd0f3f48",
-      "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gruvbox.nvim": {
       "rev": "9d0e3af224c5492069a493bb43c6ec2b78497454",
