@@ -41,6 +41,10 @@
       "rev": "0fcc83805ad11cf714a949c98c605ed717e0b83e",
       "src": "https://github.com/stevearc/oil.nvim"
     },
+    "resolve.nvim": {
+      "rev": "1ed8bcc9ce7d43a0e8e05d0001c9cadb822d95a8",
+      "src": "https://github.com/spacedentist/resolve.nvim"
+    },
     "smartcolumn.nvim": {
       "rev": "b9cdbdf42f7ac5a659204cd5926017c7ff724a19",
       "src": "https://github.com/m4xshen/smartcolumn.nvim"

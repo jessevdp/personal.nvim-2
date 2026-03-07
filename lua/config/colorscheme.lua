@@ -36,6 +36,19 @@ require("gruvbox").setup({
     FFFGitSignRenamedSelected = { fg = "purple_lite" },
     FFFGitSignUntrackedSelected = { fg = "aqua_lite" },
     FFFGitSignIgnoredSelected = { fg = "gray" },
+
+    -- resolve.nvim
+    -- TODO: upstream to gruvbox.nvim
+    ResolveOursMarker = { fg = "fg2", bg = "green_lite", blend = 30, bold = true },
+    ResolveOursMarkerHint = { fg = "fg4", bg = "green_lite", blend = 30 },
+    ResolveOursSection = { bg = "green_lite", blend = 15 },
+    ResolveTheirsMarker = { fg = "fg2", bg = "blue_lite", blend = 30, bold = true },
+    ResolveTheirsMarkerHint = { fg = "fg4", bg = "blue_lite", blend = 30 },
+    ResolveTheirsSection = { bg = "blue_lite", blend = 15 },
+    ResolveAncestorMarker = { fg = "fg2", bg = "bg3", bold = true },
+    ResolveAncestorMarkerHint = { fg = "fg4", bg = "bg3" },
+    ResolveAncestorSection = { bg = "bg2" },
+    ResolveSeparatorMarker = { fg = "fg2", bg = "bg2", bold = true },
   },
 })
 
