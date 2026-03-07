@@ -12,6 +12,10 @@
       "rev": "7fa433a83118a70fe24c1ce88d5f0bd3453c0970",
       "src": "https://github.com/j-hui/fidget.nvim"
     },
+    "gitsigns.nvim": {
+      "rev": "7c4faa3540d0781a28588cafbd4dd187a28ac6e3",
+      "src": "https://github.com/lewis6991/gitsigns.nvim"
+    },
     "gruvbox.nvim": {
       "rev": "9d0e3af224c5492069a493bb43c6ec2b78497454",
       "src": "https://gitlab.com/motaz-shokry/gruvbox.nvim.git"
