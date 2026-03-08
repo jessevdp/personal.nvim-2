@@ -20,6 +20,7 @@ require("config.wrapping")
 
 require("config.treesitter")
 require("config.lsp")
+require("config.textobjects")
 
 require("config.git")
 require("config.colorscheme")
