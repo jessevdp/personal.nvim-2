@@ -49,6 +49,10 @@ require("gruvbox").setup({
     ResolveAncestorMarkerHint = { fg = "fg4", bg = "bg3" },
     ResolveAncestorSection = { bg = "bg2" },
     ResolveSeparatorMarker = { fg = "fg2", bg = "bg2", bold = true },
+
+    -- indent-blankline.nvim
+    IblIndent = { fg = "bg_second" },
+    IblScope = { fg = "bg2" },
   },
 })
 

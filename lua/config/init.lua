@@ -17,6 +17,7 @@ require("config.terminal")
 require("config.ui")
 require("config.undo")
 require("config.wrapping")
+require("config.indent-guides")
 
 require("config.treesitter")
 require("config.lsp")
