@@ -21,6 +21,7 @@ require("config.wrapping")
 require("config.treesitter")
 require("config.lsp")
 require("config.textobjects")
+require("config.move-operations")
 
 require("config.git")
 require("config.colorscheme")
