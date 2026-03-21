@@ -2,6 +2,14 @@ vim.pack.add({
   { src = "https://github.com/Bekaboo/dropbar.nvim" },
 }, { confirm = false })
 
+vim.keymap.set("n", "<leader>tb", function()
+  if vim.wo.winbar == "" then
+    vim.wo.winbar = "%{%v:lua.dropbar()%}"
+  else
+    vim.wo.winbar = ""
+  end
+end, { desc = "Toggle dropbar" })
+
 require("dropbar").setup({
   bar = {
     enable = function(buf, win, _)
