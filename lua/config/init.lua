@@ -22,6 +22,7 @@ require("config.indent-guides")
 require("config.treesitter")
 require("config.lsp")
 require("config.textobjects")
+require("config.surround")
 require("config.move-operations")
 
 require("config.git")
