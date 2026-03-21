@@ -24,6 +24,7 @@ require("config.lsp")
 require("config.textobjects")
 require("config.surround")
 require("config.move-operations")
+require("config.split-join")
 
 require("config.git")
 require("config.colorscheme")
