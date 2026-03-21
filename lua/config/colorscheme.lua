@@ -50,6 +50,11 @@ require("gruvbox").setup({
     ResolveAncestorSection = { bg = "bg2" },
     ResolveSeparatorMarker = { fg = "fg2", bg = "bg2", bold = true },
 
+    -- nvim-treesitter-context
+    TreesitterContext = { bg = "none" },
+    TreesitterContextLineNumber = { link = "LineNr" },
+    TreesitterContextSeparator = { link = "WinSeparator" },
+
     -- indent-blankline.nvim
     IblIndent = { fg = "bg_second" },
     IblScope = { fg = "bg2" },

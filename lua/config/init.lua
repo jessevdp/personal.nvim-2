@@ -20,6 +20,7 @@ require("config.wrapping")
 require("config.indent-guides")
 
 require("config.treesitter")
+require("config.context-display")
 require("config.lsp")
 require("config.textobjects")
 require("config.surround")
