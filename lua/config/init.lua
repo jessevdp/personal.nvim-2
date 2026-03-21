@@ -32,6 +32,6 @@ require("config.colorscheme")
 require("config.icons")
 
 require("config.notifications")
-require("config.dropbar")
+require("config.winbar")
 require("config.explorer")
 require("config.picker")
