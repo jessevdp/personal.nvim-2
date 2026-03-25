@@ -44,6 +44,7 @@ require("dropbar").setup({
   },
   sources = {
     path = {
+      min_widths = { 16, 16, 16 },
       relative_to = function(buf, win)
         local ok, cwd = pcall(vim.fn.getcwd, win)
         local base = ok and cwd or vim.fn.getcwd()
@@ -58,6 +59,14 @@ require("dropbar").setup({
     },
     terminal = {
       show_current = false,
+    },
+    treesitter = {
+      max_depth = 4,
+      min_widths = { 1 },
+    },
+    lsp = {
+      max_depth = 4,
+      min_widths = { 1 },
     },
   },
 })
