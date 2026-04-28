@@ -10,8 +10,17 @@ vim.keymap.set("n", "<leader>tb", function()
   end
 end, { desc = "Toggle dropbar" })
 
+-- Workaround: BufModifiedSet removed in Neovim nightly
+-- https://github.com/Bekaboo/dropbar.nvim/issues/279
 require("dropbar").setup({
   bar = {
+    update_events = {
+      buf = {
+        "FileChangedShellPost",
+        "TextChanged",
+        "ModeChanged",
+      },
+    },
     enable = function(buf, win, _)
       buf = vim._resolve_bufnr(buf)
       if not vim.api.nvim_buf_is_valid(buf) or not vim.api.nvim_win_is_valid(win) then
