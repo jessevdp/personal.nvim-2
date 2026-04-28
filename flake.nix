@@ -36,6 +36,7 @@
           configRoot = ./.;
           extraPackages = with pkgs; [
             tree-sitter # for nvim-treesitter
+            delta # for resolve.nvim conflict diff views
           ];
         }).wrapper;
 

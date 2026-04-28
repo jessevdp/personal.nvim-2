@@ -2,6 +2,14 @@ vim.pack.add({
   { src = "https://github.com/Bekaboo/dropbar.nvim" },
 }, { confirm = false })
 
+vim.keymap.set("n", "<leader>tb", function()
+  if vim.wo.winbar == "" then
+    vim.wo.winbar = "%{%v:lua.dropbar()%}"
+  else
+    vim.wo.winbar = ""
+  end
+end, { desc = "Toggle dropbar" })
+
 require("dropbar").setup({
   bar = {
     enable = function(buf, win, _)
@@ -35,8 +43,30 @@ require("dropbar").setup({
     end,
   },
   sources = {
+    path = {
+      min_widths = { 16, 16, 16 },
+      relative_to = function(buf, win)
+        local ok, cwd = pcall(vim.fn.getcwd, win)
+        local base = ok and cwd or vim.fn.getcwd()
+        if vim.bo[buf].ft == "oil" then
+          local dir = require("oil").get_current_dir(buf)
+          if dir and vim.fn.fnamemodify(dir, ":p") == vim.fn.fnamemodify(base, ":p") then
+            return vim.fn.fnamemodify(base, ":h")
+          end
+        end
+        return base
+      end,
+    },
     terminal = {
       show_current = false,
+    },
+    treesitter = {
+      max_depth = 4,
+      min_widths = { 1 },
+    },
+    lsp = {
+      max_depth = 4,
+      min_widths = { 1 },
     },
   },
 })

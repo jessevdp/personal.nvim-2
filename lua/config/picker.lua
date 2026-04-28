@@ -1,16 +1,41 @@
 vim.pack.add({
-  { src = "https://github.com/ibhagwan/fzf-lua" },
+  { src = "https://github.com/dmtrKovalenko/fff.nvim" },
 }, { confirm = false })
 
-local fzf = require("fzf-lua")
-
-fzf.setup({
-  { "borderless-full" },
+vim.api.nvim_create_autocmd("PackChanged", {
+  callback = function(event)
+    if event.data.spec.name == "fff.nvim" and event.data.kind == "update" then
+      require("fff.download").download_or_build_binary()
+    end
+  end,
 })
 
-vim.keymap.set("n", "<leader><leader>", fzf.buffers)
-vim.keymap.set("n", "<leader>sf", fzf.git_files)
-vim.keymap.set("n", "<leader>sg", fzf.live_grep)
-vim.keymap.set("n", "<leader>sb", fzf.buffers)
-vim.keymap.set("n", "<leader>sh", fzf.helptags)
-vim.keymap.set("n", "<leader>s.", fzf.resume)
+local download = require("fff.download")
+if not vim.uv.fs_stat(download.get_binary_path()) then
+  download.download_or_build_binary()
+end
+
+local fff = require("fff")
+
+fff.setup({
+  prompt = "> ",
+  title = "Files",
+  layout = {
+    prompt_position = "top",
+    preview_position = "right",
+    flex = {
+      wrap = "bottom",
+    },
+  },
+  preview = {
+    line_numbers = true,
+  },
+  keymaps = {
+    close = { "<Esc>", "<C-c>" },
+    cycle_grep_modes = "<C-space>",
+  },
+})
+
+vim.keymap.set("n", "<leader><leader>", fff.find_files)
+vim.keymap.set("n", "<leader>sf", fff.find_files)
+vim.keymap.set("n", "<leader>sg", fff.live_grep)

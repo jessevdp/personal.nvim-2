@@ -13,6 +13,10 @@ vim.lsp.enable({
 
 vim.lsp.inlay_hint.enable()
 
+vim.keymap.set("n", "<leader>th", function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = "Toggle inlay hints" })
+
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function()
     vim.keymap.set("n", "gqB", function()
