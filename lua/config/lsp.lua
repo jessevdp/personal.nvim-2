@@ -3,6 +3,7 @@ vim.pack.add({
 }, { confirm = false })
 
 vim.lsp.enable({
+  "eslint",
   "jsonls",
   "lua_ls",
   "nil_ls",
