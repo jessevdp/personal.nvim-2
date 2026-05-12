@@ -9,6 +9,7 @@ vim.lsp.enable({
   "nixd",
   "ruby_lsp",
   "stylua",
+  "ts_ls",
 })
 
 vim.lsp.inlay_hint.enable()
