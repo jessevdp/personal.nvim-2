@@ -1,10 +1,10 @@
 vim.pack.add({
-  { src = "https://github.com/dmtrKovalenko/fff.nvim" },
+  { src = "https://github.com/dmtrKovalenko/fff" },
 }, { confirm = false })
 
 vim.api.nvim_create_autocmd("PackChanged", {
   callback = function(event)
-    if event.data.spec.name == "fff.nvim" and event.data.kind == "update" then
+    if event.data.spec.name == "fff" and event.data.kind == "update" then
       require("fff.download").download_or_build_binary()
     end
   end,

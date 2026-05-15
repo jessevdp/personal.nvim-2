@@ -4,9 +4,9 @@
       "rev": "f0a42bd92aa647e44221397723453403f5e20f16",
       "src": "https://github.com/Bekaboo/dropbar.nvim"
     },
-    "fff.nvim": {
-      "rev": "4c5c92ac38364032e71e11d6adf49c8a326dcde8",
-      "src": "https://github.com/dmtrKovalenko/fff.nvim"
+    "fff": {
+      "rev": "d56006d26f88658102adc46617381bf4a02b165f",
+      "src": "https://github.com/dmtrKovalenko/fff"
     },
     "fidget.nvim": {
       "rev": "889e2e96edef4e144965571d46f7a77bcc4d0ddf",
